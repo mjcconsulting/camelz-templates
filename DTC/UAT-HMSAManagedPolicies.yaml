@@ -1,0 +1,312 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Identity-ManagedPolicies Template.
+  This creates IAM HMSA ManagedPolicies.
+Rules:
+  ValidateRegion:
+    Assertions:
+      - Assert: !Equals [ !Ref 'AWS::Region', us-east-1 ]
+        AssertDescription: This Template can only be used in Region us-east-1.
+Resources:
+  HMSACodeCommitUserPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: HMSACodeCommitUserPolicy
+      Description: Provides partial access to HMSA AWS services and resources, needed for HMSA CodeCommit UserPolicy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: HMSACodeCommitUserPolicy
+            Effect: Allow
+            Action:
+              - 'codecommit:CreateBranch'
+              - 'codecommit:TagResource'
+              - 'codecommit:ListPullRequests'
+              - 'codecommit:UpdatePullRequestApprovalRuleContent'
+              - 'codecommit:PutFile'
+              - 'codecommit:GetPullRequestApprovalStates'
+              - 'codecommit:CreateCommit'
+              - 'codecommit:ListTagsForResource'
+              - 'codecommit:BatchDescribeMergeConflicts'
+              - 'codecommit:GetCommentsForComparedCommit'
+              - 'codecommit:GetComment'
+              - 'codecommit:UpdateComment'
+              - 'codecommit:UpdateRepositoryDescription'
+              - 'codecommit:CreatePullRequest'
+              - 'codecommit:UpdatePullRequestApprovalState'
+              - 'codecommit:GetPullRequestOverrideState'
+              - 'codecommit:PostCommentForPullRequest'
+              - 'codecommit:GetRepositoryTriggers'
+              - 'codecommit:UpdatePullRequestDescription'
+              - 'codecommit:UntagResource'
+              - 'codecommit:UpdateApprovalRuleTemplateContent'
+              - 'codecommit:GetFile'
+              - 'codecommit:GetDifferences'
+              - 'codecommit:GetRepository'
+              - 'codecommit:GetMergeConflicts'
+              - 'codecommit:GetMergeCommit'
+              - 'codecommit:GitPush'
+              - 'codecommit:GetMergeOptions'
+              - 'codecommit:AssociateApprovalRuleTemplateWithRepository'
+              - 'codecommit:BatchAssociateApprovalRuleTemplateWithRepositories'
+              - 'codecommit:GetReferences'
+              - 'codecommit:ListRepositories'
+              - 'codecommit:UpdatePullRequestTitle'
+              - 'codecommit:GetCommit'
+              - 'codecommit:GetCommitHistory'
+              - 'codecommit:GetCommitsFromMergeBase'
+              - 'codecommit:BatchGetCommits'
+              - 'codecommit:TestRepositoryTriggers'
+              - 'codecommit:UpdatePullRequestStatus'
+              - 'codecommit:GetPullRequest'
+              - 'codecommit:PutRepositoryTriggers'
+              - 'codecommit:UploadArchive'
+              - 'codecommit:ListAssociatedApprovalRuleTemplatesForRepository'
+              - 'codecommit:ListBranches'
+              - 'codecommit:GitPull'
+              - 'codecommit:BatchGetRepositories'
+              - 'codecommit:BatchDisassociateApprovalRuleTemplateFromRepositories'
+              - 'codecommit:GetFolder'
+              - 'codecommit:PostCommentReply'
+              - 'codecommit:GetBranch'
+              - 'codecommit:DisassociateApprovalRuleTemplateFromRepository'
+              - 'codecommit:UpdateApprovalRuleTemplateDescription'
+            Resource: '*'
+  HMSACodeBuildUserPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: HMSACodeBuildUserPolicy
+      Description: Provides partial access to HMSA AWS services and resources, needed for HMSA CodeBuild UserPolicy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: HMSACodeBuildUserPolicy
+            Effect: Allow
+            Action:
+              - 'codebuild:ListReportsForReportGroup'
+              - 'codebuild:DescribeTestCases'
+              - 'codebuild:GetResourcePolicy'
+              - 'codebuild:StopBuild'
+              - 'codebuild:ListReportGroups'
+              - 'codebuild:ListBuildsForProject'
+              - 'codebuild:UpdateWebhook'
+              - 'codebuild:UpdateProject'
+              - 'codebuild:BatchGetBuilds'
+              - 'codebuild:CreateReport'
+              - 'codebuild:UpdateReport'
+              - 'codebuild:ImportSourceCredentials'
+              - 'codebuild:ListReports'
+              - 'codebuild:ListProjects'
+              - 'codebuild:BatchGetReportGroups'
+              - 'codebuild:ListConnectedOAuthAccounts'
+              - 'codebuild:BatchGetProjects'
+              - 'codebuild:InvalidateProjectCache'
+              - 'codebuild:BatchGetReports'
+              - 'codebuild:CreateWebhook'
+              - 'codebuild:UpdateReportGroup'
+              - 'codebuild:CreateReportGroup'
+              - 'codebuild:PutResourcePolicy'
+              - 'codebuild:ListBuilds'
+              - 'codebuild:StartBuild'
+              - 'codebuild:BatchPutTestCases'
+            Resource: '*'
+  HMSACodeDeployUserPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: HMSACodeDeployUserPolicy
+      Description: Provides partial access to HMSA AWS services and resources, needed for HMSA CodeDeploy UserPolicy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: HMSACodeDeployUserPolicy
+            Effect: Allow
+            Action:
+              - 'codedeploy:BatchGetDeploymentGroups'
+              - 'codedeploy:PutLifecycleEventHookExecutionStatus'
+              - 'codedeploy:CreateApplication'
+              - 'codedeploy:CreateDeployment'
+              - 'codedeploy:GetApplicationRevision'
+              - 'codedeploy:GetDeploymentConfig'
+              - 'codedeploy:DeregisterOnPremisesInstance'
+              - 'codedeploy:CreateDeploymentConfig'
+              - 'codedeploy:UpdateDeploymentGroup'
+              - 'codedeploy:CreateDeploymentGroup'
+              - 'codedeploy:ListApplications'
+              - 'codedeploy:ListOnPremisesInstances'
+              - 'codedeploy:ListDeploymentInstances'
+              - 'codedeploy:ListTagsForResource'
+              - 'codedeploy:RegisterOnPremisesInstance'
+              - 'codedeploy:ListGitHubAccountTokenNames'
+              - 'codedeploy:BatchGetApplications'
+              - 'codedeploy:ListDeploymentConfigs'
+              - 'codedeploy:GetApplication'
+              - 'codedeploy:SkipWaitTimeForInstanceTermination'
+              - 'codedeploy:TagResource'
+              - 'codedeploy:GetDeploymentGroup'
+              - 'codedeploy:UpdateApplication'
+              - 'codedeploy:RegisterApplicationRevision'
+              - 'codedeploy:BatchGetDeploymentTargets'
+              - 'codedeploy:ListDeployments'
+              - 'codedeploy:GetDeploymentTarget'
+              - 'codedeploy:StopDeployment'
+              - 'codedeploy:ListDeploymentTargets'
+              - 'codedeploy:ContinueDeployment'
+              - 'codedeploy:AddTagsToOnPremisesInstances'
+              - 'codedeploy:BatchGetDeployments'
+              - 'codedeploy:BatchGetApplicationRevisions'
+              - 'codedeploy:BatchGetDeploymentInstances'
+              - 'codedeploy:ListDeploymentGroups'
+              - 'codedeploy:GetDeployment'
+              - 'codedeploy:ListApplicationRevisions'
+              - 'codedeploy:BatchGetOnPremisesInstances'
+            Resource: '*'
+  HMSACodePipelineUserPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: HMSACodePipelineUserPolicy
+      Description: Provides partial access to HMSA AWS services and resources, needed for HMSACode Pipeline UserPolicy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: HMSACodePipelineUserPolicy
+            Effect: Allow
+            Action:
+              - 'codepipeline:ListPipelineExecutions'
+              - 'codepipeline:ListActionExecutions'
+              - 'codepipeline:CreatePipeline'
+              - 'codepipeline:AcknowledgeThirdPartyJob'
+              - 'codepipeline:CreateCustomActionType'
+              - 'codepipeline:ListTagsForResource'
+              - 'codepipeline:TagResource'
+              - 'codepipeline:RetryStageExecution'
+              - 'codepipeline:PutJobFailureResult'
+              - 'codepipeline:ListPipelines'
+              - 'codepipeline:GetPipeline'
+              - 'codepipeline:RegisterWebhookWithThirdParty'
+              - 'codepipeline:ListWebhooks'
+              - 'codepipeline:StartPipelineExecution'
+              - 'codepipeline:PutJobSuccessResult'
+              - 'codepipeline:GetThirdPartyJobDetails'
+              - 'codepipeline:GetJobDetails'
+              - 'codepipeline:PutApprovalResult'
+              - 'codepipeline:StopPipelineExecution'
+              - 'codepipeline:AcknowledgeJob'
+              - 'codepipeline:UpdatePipeline'
+              - 'codepipeline:GetPipelineState'
+              - 'codepipeline:GetPipelineExecution'
+              - 'codepipeline:PutActionRevision'
+              - 'codepipeline:ListActionTypes'
+            Resource: '*'
+  HMSARedshiftUserPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: HMSARedshiftUserPolicy
+      Description: Provides partial access to HMSA AWS services and resources, needed for HMSACode Pipeline UserPolicy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: HMSARedshiftUserPolicy
+            Effect: Allow
+            Action:
+              - 'redshift:DescribeHsmConfigurations'
+              - 'redshift:ListDatabases'
+              - 'redshift:DescribeClusterTracks'
+              - 'redshift:ModifySavedQuery'
+              - 'redshift:DescribeEvents'
+              - 'redshift:DescribeDefaultClusterParameters'
+              - 'redshift:ModifyClusterMaintenance'
+              - 'redshift:DescribeEventCategories'
+              - 'redshift:DescribeClusterSubnetGroups'
+              - 'redshift:DescribeQuery'
+              - 'redshift:DescribeReservedNodeOfferings'
+              - 'redshift:DescribeClusterVersions'
+              - 'redshift:DescribeClusterSnapshots'
+              - 'redshift:DescribeSavedQueries'
+              - 'redshift:DescribeStorage'
+              - 'redshift:DescribeTableRestoreStatus'
+              - 'redshift:DescribeClusterSecurityGroups'
+              - 'redshift:ModifyScheduledAction'
+              - 'redshift:DescribeEventSubscriptions'
+              - 'redshift:DescribeOrderableClusterOptions'
+              - 'redshift:DescribeHsmClientCertificates'
+              - 'redshift:DescribeAccountAttributes'
+              - 'redshift:ViewQueriesInConsole'
+              - 'redshift:DescribeScheduledActions'
+              - 'redshift:DescribeTags'
+              - 'redshift:AcceptReservedNodeExchange'
+              - 'redshift:DescribeClusterDbRevisions'
+              - 'redshift:FetchResults'
+              - 'redshift:ViewQueriesFromConsole'
+              - 'redshift:ListTables'
+              - 'redshift:CancelQuery'
+              - 'redshift:ListSchemas'
+              - 'redshift:DescribeSnapshotCopyGrants'
+              - 'redshift:DescribeReservedNodes'
+              - 'redshift:DescribeNodeConfigurationOptions'
+              - 'redshift:ListSavedQueries'
+              - 'redshift:DescribeClusters'
+              - 'redshift:CancelQuerySession'
+              - 'redshift:ExecuteQuery'
+              - 'redshift:GetReservedNodeExchangeOfferings'
+              - 'redshift:DescribeTable'
+              - 'redshift:RebootCluster'
+              - 'redshift:EnableLogging'
+              - 'redshift:CancelResize'
+              - 'redshift:DescribeLoggingStatus'
+              - 'redshift:EnableSnapshotCopy'
+              - 'redshift:PauseCluster'
+              - 'redshift:ResumeCluster'
+              - 'redshift:ModifySnapshotCopyRetentionPeriod'
+            Resource: '*'
+  HMSAAPIUserPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: HMSAAPIUserPolicy
+      Description: Provides partial access to HMSA AWS services and resources, needed for HMSACode Pipeline UserPolicy
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: HMSAAPIUserPolicy
+            Effect: Allow
+            Action:
+              - 'apigateway:SetWebACL'
+              - 'apigateway:PATCH'
+              - 'apigateway:POST'
+              - 'apigateway:GET'
+            Resource: '*'
+Outputs:
+  HMSACodeCommitUserPolicy:
+    Description: The HMSA CodeCommit UserPolicy
+    Value: !Ref HMSACodeCommitUserPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSACodeCommitUserPolicy
+  HMSACodeBuildUserPolicy:
+    Description: The HMSA CodeBuild UserPolicy
+    Value: !Ref HMSACodeBuildUserPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSACodeBuildUserPolicy
+  HMSACodeDeployUserPolicy:
+    Description: The HMSA CodeDeploy UserPolicy
+    Value: !Ref HMSACodeDeployUserPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSACodeDeployUserPolicy
+  HMSACodePipelineUserPolicy:
+    Description: The HMSACode Pipeline UserPolicy
+    Value: !Ref HMSACodePipelineUserPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSACodePipelineUserPolicy
+  HMSARedshiftUserPolicy:
+    Description: The HMSARedshift UserPolicy
+    Value: !Ref HMSARedshiftUserPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSARedshiftUserPolicy
+  HMSAAPIUserPolicy:
+    Description: The HMSAAPI UserPolicy
+    Value: !Ref HMSAAPIUserPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSAAPIUserPolicy

@@ -1,0 +1,256 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Build-ImageBuilder-ImageRecipes Template.
+  WIP: This configures the ImageBuilder...
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - ImageBuilderComponentsStackName
+          - PrivateAMIFunctionsStackName
+          - AMIFunctionsStackName
+          - KeysStackName
+          - CodesStackName
+      - Label:
+          default: System Configuration
+        Parameters:
+          - CompanyName
+          - SystemName
+      - Label:
+          default: Environment Configuration
+        Parameters:
+          - AccountName
+          - EnvironmentName
+      - Label:
+          default: ImageRecipe Configuration
+        Parameters:
+          - EncryptionType
+    ParameterLabels:
+      ImageBuilderComponentsStackName:
+        default: ImageBuilder Components Stack Name
+      PrivateAMIFunctionsStackName:
+        default: PrivateAMIFunctions Stack Name
+      AMIFunctionsStackName:
+        default: AMIFunctions Stack Name
+      KeysStackName:
+        default: Keys Stack Name
+      CodesStackName:
+        default: Codes Stack Name
+      CompanyName:
+        default: Company Name
+      SystemName:
+        default: System Name
+      AccountName:
+        default: Account Name
+      EnvironmentName:
+        default: Environment Name
+      EncryptionType:
+        default: Encryption Type
+Parameters:
+  ImageBuilderComponentsStackName:
+    Description: Name of the CloudFormation Stack containing the ImageBuilder Components
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: ImageBuilder-Components
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  PrivateAMIFunctionsStackName:
+    Description: Name of the CloudFormation Stack containing the Private AMI Functions
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: PrivateAMIFunctions
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  AMIFunctionsStackName:
+    Description: Name of the CloudFormation Stack containing the AMI Functions
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: AMIFunctions
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  KeysStackName:
+    Description: Name of the CloudFormation Stack containing Keys
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: Keys
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  CodesStackName:
+    Description: Name of the CloudFormation Stack containing the Codes Resources
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: Codes
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  CompanyName:
+    Description: Name of the Company associated with the Stack
+    Type: String
+    MinLength: 2
+    MaxLength: 32
+    Default: Camelz
+    AllowedPattern: ^[A-Z][a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters.
+  SystemName:
+    Description: Name of the System associated with the Stack
+    Type: String
+    MinLength: 2
+    MaxLength: 32
+    Default: Prototype
+    AllowedPattern: ^[A-Z][a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters.
+  AccountName:
+    Description: Name of the Account associated with the Stack
+    Type: String
+    Default: Production
+    AllowedValues:
+      - Production
+      - Staging
+      - UAT
+      - QA
+      - Testing
+      - Development
+      - Build
+      - Core
+      - Recovery
+      - Log
+      - Management
+      - Jumpstart
+      - Organization
+    ConstraintDescription: must be Production, Staging, UAT, QA, Testing, Development, Build, Core, Recovery, Log, Management, Jumpstart or Organization.
+  EnvironmentName:
+    Description: Name of the Environment associated with the Stack
+    Type: String
+    Default: Production
+    AllowedValues:
+      - Production
+      - Staging
+      - UAT
+      - QA
+      - Testing
+      - Development
+      - Build
+      - Core
+      - Recovery
+      - Log
+      - Identity
+      - Management
+      - Organization
+    ConstraintDescription: must be Production, Staging, UAT, QA, Testing, Development, Build, Core, Recovery, Log, Identity, Management or Organization.
+  EncryptionType:
+    Description: Type of Encryption
+    Type: String
+    Default: default
+    AllowedValues:
+      - default
+      - custom
+      - none
+    ConstraintDescription: must be default, custom or none.
+Mappings:
+  RegionNameMap:
+    us-east-1:
+      Name: Virginia
+      Code: ue1
+    us-east-2:
+      Name: Ohio
+      Code: ue2
+    us-west-1:
+      Name: California
+      Code: uw1
+    us-west-2:
+      Name: Oregon
+      Code: uw2
+    ap-east-1:
+      Name: HongKong
+      Code: ae1
+    ap-south-1:
+      Name: Mumbai
+      Code: ad1
+    ap-northeast-2:
+      Name: Seoul
+      Code: an2
+    ap-southeast-1:
+      Name: Singapore
+      Code: as1
+    ap-southeast-2:
+      Name: Sydney
+      Code: as2
+    ap-northeast-1:
+      Name: Tokyo
+      Code: an1
+    ca-central-1:
+      Name: Canada
+      Code: cc1
+    eu-central-1:
+      Name: Frankfurt
+      Code: ec1
+    eu-west-1:
+      Name: Ireland
+      Code: ew1
+    eu-west-2:
+      Name: London
+      Code: ew2
+    eu-west-3:
+      Name: Paris
+      Code: ew3
+    eu-north-1:
+      Name: Stockholm
+      Code: en1
+    me-south-1:
+      Name: Bahrain
+      Code: ms1
+    sa-east-1:
+      Name: SaoPaulo
+      Code: se1
+Conditions:
+  ConfigureAccountEnvironment: !Or [ !Not [ !Equals [ !Ref AccountName, !Ref EnvironmentName ]], !Equals [ !Ref AccountName, Jumpstart ]]
+  ConfigureGlobal: !Equals [ !Ref 'AWS::Region', us-east-1 ]
+  ConfigureEncryption: !Not [ !Equals [ !Ref EncryptionType, none ]]
+  ConfigureEncryptionKey: !Equals [ !Ref EncryptionType, custom ]
+Resources:
+  AmazonLinux2Image:
+    Type: Custom::AmazonLinux2Image
+    Properties:
+      ServiceToken: !ImportValue
+        Fn::Sub: ${AMIFunctionsStackName}-AmazonLinux2ImageFunctionArn
+      OSName: !Ref OSName
+  RHELImage:
+    Type: Custom::RHELImage
+    Properties:
+      ServiceToken: !ImportValue
+        Fn::Sub: ${AMIFunctionsStackName}-RHELImageFunctionArn
+      OSName: !Ref OSName
+  BaselineAmazonLinux2LinuxImageRecipe:
+    Type: AWS::ImageBuilder::ImageRecipe
+    Properties:
+      Name: BaselineAmazonLinux2ImageRecipe
+      Version: '1.0.0'
+      ParentImage: !Ref AmazonLinux2Image
+      Description: Baseline Amazon Linux 2 Image Recipe
+      Components:
+        - ComponentArn: !ImportValue
+          Fn::Sub: ${ImageBuilderComponentsStackName}-InternalHelloWorldComponentArn
+      BlockDeviceMappings:
+        - DeviceName: "device-name"
+          VirtualName: "virtual-name"
+          Ebs:
+            DeleteOnTermination: true
+            Encrypted: true
+            Iops: 100
+            KmsKeyId: !Ref KmsKeyId
+            SnapshotId: "snapshot-id"
+            VolumeType: "gp2"
+            VolumeSize: 100
+      Tags:
+        Name: BaselineAmazonLinux2ImageRecipe
+Outputs:
+  BaselineAmazonLinux2LinuxImageRecipeArn:
+    Description: The BaselineAmazonLinux2LinuxImageRecipe ARN
+    Value: !Ref BaselineAmazonLinux2LinuxImageRecipe
+    Export:
+      Name: !Sub ${AWS::StackName}-BaselineAmazonLinux2LinuxImageRecipeArn

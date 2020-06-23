@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates resources required by EC2 Image Builder.
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+Resources:
+  InstanceProfileRole:
+    Type: AWS::IAM::Role # https://amzn.to/2RcA3Q9
+    Properties:
+      AssumeRolePolicyDocument:
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [ "ec2.amazonaws.com" ]
+            },
+            "Action": [ "sts:AssumeRole" ]
+          }
+          ]
+        }
+      Policies:
+        - PolicyName: ImageBuilderPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:SendCommand
+                  - ec2:CreateTags
+                  - sts:DecodeAuthorizationMessage
+                Resource:
+                  - '*'
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/imagebuilder*"
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource:
+                  - !Sub "arn:aws:s3:::imagebuilder-assets-${AWS::Region}-${VpcId}"
+                  - !Sub "arn:aws:s3:::imagebuilder-assets-${AWS::Region}-${VpcId}/*"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/EC2InstanceProfileForImageBuilder
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonInspectorFullAccess
+
+  InstanceProfile:
+    DependsOn: InstanceProfileRole
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: InstanceProfileRole
+
+  KMSKey:
+    DependsOn: InstanceProfileRole
+    Type: AWS::KMS::Key
+    Properties:
+      Description: The key used to encrypt resources for the EC2 Image Builder POC.
+      Enabled: true
+      EnableKeyRotation: false
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: AllowIAMUserPermissions
+        Statement:
+          - Sid: EnableIAMUserPermissions
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Sub: arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: AllowKeyAdministration
+            Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Sub: arn:aws:iam::${AWS::AccountId}:user/cmeade
+                - arn:aws:iam::682388979470:role/ManagedInstance # user must exist
+            Action:
+              - kms:Create*
+              - kms:Describe*
+              - kms:Enable*
+              - kms:List*
+              - kms:Put*
+              - kms:Update*
+              - kms:Revoke*
+              - kms:Disable*
+              - kms:Get*
+              - kms:Delete*
+              - kms:TagResource
+              - kms:UntagResource
+            Resource: '*'
+          - Sid: AllowKeyUse
+            Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Sub: arn:aws:iam::${AWS::AccountId}:user/cmeade # user must exist
+                - !GetAtt 'InstanceProfileRole.Arn'
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: '*'
+      KeyUsage: ENCRYPT_DECRYPT
+      PendingWindowInDays: 28
+
+  AssetsBucket:
+    DependsOn:
+      - KMSKey
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'imagebuilder-assets-${AWS::Region}-${VpcId}'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              KMSMasterKeyID:
+                Ref: KMSKey
+              SSEAlgorithm: "aws:kms"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: Image Builder POC
+      KmsMasterKeyId:
+        Ref: KMSKey # needs subscription for notification
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ImageBuilder POC
+      VpcId:
+        Ref: VpcId
+
+Outputs:
+  AssetsBucket:
+    Value: !Ref AssetsBucket
+  KMSKeyID:
+    Value: !Ref KMSKey
+  KMSKeyARN:
+    Value: !GetAtt KMSKey.Arn
+  InstanceProfile:
+    Value: !Ref InstanceProfile
+  SNSTopic:
+    Value: !Ref SNSTopic
+  SecurityGroup:
+    Value: !Ref SecurityGroup

@@ -1,0 +1,435 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Application-CICD Template.
+  Creates AWS Code-Commit-reposiroty & Code-Pipeline from this template and Add all the AWS Services in pipeline to deply and create through cloudfomration.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Environment Configuration
+        Parameters:
+          - EnvironmentName
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - BucketsStackName
+      - Label:
+          default: System Configuration
+        Parameters:
+          - ArtifactStoreBucket
+          - BranchName
+          - RepositoryName
+          - CodePipelineName
+          - DevelopmentCodePipelineName
+    ParameterLabels:
+      EnvironmentName:
+        default: Environment Name
+      BuildBucketsStackName:
+        default: Build Buckets Stack Name
+      ArtifactStoreBucket:
+        default: Artifact Store Bucket
+      BranchName:
+        default: Branch Name
+      RepositoryName:
+        default: Repository Name
+      CodePipelineName:
+        default: Code Pipeline Name
+      DevelopmentCodePipelineName:
+        default: Code Pipeline Name
+      CodeDeployApplication:
+        default: Code Deploy Application
+      CodeDeployDeploymentGroup:
+        default: Code Deploy DeploymentGroup
+Parameters:
+  EnvironmentName:
+    Description: Name of the Environment associated with the Stack
+    Type: String
+    Default: Production
+    AllowedValues:
+      - Production
+      - Staging
+      - UAT
+      - QA
+      - Testing
+      - Development
+      - Build
+      - Core
+      - Recovery
+      - Log
+      - Identity
+      - Management
+      - Organization
+    ConstraintDescription: must be Production, Staging, UAT, QA, Testing, Development, Build, Core, Recovery, Log, Identity, Management or Organization.
+  BucketsStackName:
+      Description: Name of the CloudFormation Stack containing Build Buckets
+      Type: String
+      MinLength: 2
+      MaxLength: 64
+      Default: DataLakeBuckets
+      # AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+      # ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  BranchName:
+    Description: 'CodeCommit branch name for all the resources'
+    Type: String
+    Default: master
+  RepositoryName:
+    Description: CodeCommit repostiory which contains CloudFormation template for pipeline
+    Type: String
+    Default: HMSA-AWS-Service-Codecommit-Repositor
+  CodePipelineName:
+    Description: pipeline name
+    Type: String
+    Default: HMSA-AWS-Service-Codepipeline
+  DevelopmentCodePipelineName:
+    Description: Development Code pipeline name
+    Type: String
+    Default: HMSA-AWS-Service-Codepipeline-Developemnt
+Resources:
+  CodePipelineAwsServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - codepipeline.amazonaws.com
+                - codebuild.amazonaws.com
+                - codedeploy.amazonaws.com
+                - cloudformation.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: CodePipeline-AWS-Service
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:*'
+                  - 'cloudformation:*'
+                  - 'codebuild:*'
+                  - 'codecommit:*'
+                  - 'codedeploy:*'
+                  - 'codepipeline:*'
+                  - 'apiGateway:*'
+                  - 'athena:*'
+                  - 'redshift:*'
+                  - 'route53:*'
+                  - 'rds:*'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'iam:PassRole'
+                  - 'iam:CreateRole'
+                  - 'iam:ListPolicyVersions'
+                  - 'iam:DeletePolicy'
+                  - 'iam:DeleteRolePolicy'
+                  - 'iam:DetachRolePolicy'
+                  - 'iam:DeleteRole'
+                  - 'iam:PutRolePolicy'
+                  - 'iam:AttachRolePolicy'
+                  - 'iam:getRolePolicy'
+                  - 'iam:GetRole'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:CreateLogGroup'
+                  - 'logs:DeleteLogGroup'
+                  - 'logs:PutRetentionPolicy'
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'lambda:GetFunction'
+                  - 'lambda:CreateFunction'
+                  - 'lambda:DeleteFunction'
+                  - 'lambda:GetLayerVersion'
+                  - 'lambda:GetFunctionConfiguration'
+                  - 'cloudwatch:PutMetricAlarm'
+                  - 'cloudwatch:DeleteAlarms'
+                  - 'ec2:TerminateInstances'
+                  - 'ec2:DescribeKeyPairs'
+                  - 'ec2:DescribeSubnets'
+                  - 'ec2:CreateSecurityGroup'
+                  - 'ec2:DeleteSecurityGroups'
+                  - 'ec2:DeleteSecurityGroup'
+                  - 'ec2:DescribeSecurityGroups'
+                  - 'iam:DeleteInstanceProfile'
+                  - 'ec2:AuthorizeSecurityGroupIngress'
+                  - 'ec2:createTags'
+                  - 'iam:CreateInstanceProfile'
+                  - 'iam:AddRoleToInstanceProfile'
+                  - 'events:PutRule'
+                  - 'events:DeleteRule'
+                  - 'events:RemoveTargets'
+                  - 'events:PutTargets'
+                  - 'iam:RemoveRoleFromInstanceProfile'
+                  - 'events:DescribeRule'
+                  - 'ec2:RunInstances'
+                  - 'ec2:DescribeInstances'
+                  - 'iam:GetPolicy'
+                  - 'iam:CreatePolicy'
+                  - 'cloudwatch:GetDashboard'
+                  - 'lambda:InvokeFunction'
+                  - 'cloudwatch:PutDashboard'
+                  - 'cloudwatch:DeleteDashboards'
+                  - 'redshift:ModifyCluster'
+                  - 'iam:TagRole'
+                  - 'ec2:AllocateAddress'
+                  - 'ec2:AssociateAddress'
+                  - 'ec2:AttachNetworkInterface'
+                  - 'ec2:DescribeAccountAttributes'
+                  - 'ec2:DescribeAddresses'
+                  - 'ec2:DescribeAvailabilityZones'
+                  - 'ec2:DescribeInternetGateways'
+                  - 'ec2:DescribeSecurityGroups'
+                  - 'ec2:DescribeSubnets'
+                  - 'ec2:DescribeVpcs'
+                  - 'ec2:RevokeSecurityGroupEgress'
+                  - 'ec2:AuthorizeSecurityGroupEgress'
+                  - 'ec2:AuthorizeSecurityGroupIngress'
+                  - 'ec2:CreateSecurityGroup'
+                  - 'ec2:DeleteSecurityGroup'
+                  - 'ec2:DescribeInstanceAttribute'
+                  - 'ec2:DescribeInstanceStatus'
+                  - 'ec2:DescribeInstances'
+                  - 'ec2:DescribeNetworkAcls'
+                  - 'ec2:DescribeSecurityGroups'
+                  - 'ec2:RevokeSecurityGroupEgress'
+                  - 'ec2:RevokeSecurityGroupIngress'
+                  - 'route53:GetHostedZone'
+                  - 'route53:UpdateHostedZoneComment'
+                  - 'route53:GetHostedZone'
+                  - 'route53:ListHostedZones'
+                  - 'route53:ChangeResourceRecordSets'
+                  - 'route53:ListResourceRecordSets'
+                  - 'route53:GetHostedZoneCount'
+                  - 'route53:ListHostedZonesByName'
+                  - 'cloudwatch:Describe*'
+                  - 'cloudwatch:Get*'
+                Resource: '*'
+  CodeRepository:
+    Type: 'AWS::CodeCommit::Repository'
+    Properties:
+      RepositoryName: !Ref RepositoryName
+      RepositoryDescription: This repository will store Cloud Formation Templates for AWS Services
+  Codepipeline:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: !ImportValue
+            Fn::Sub: ${BucketsStackName}-CICDArtifactsBucket
+      Name: !Ref CodePipelineName
+      RoleArn: !GetAtt CodePipelineAwsServiceRole.Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceAction
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: '1'
+                Provider: CodeCommit
+              OutputArtifacts:
+                - Name: "SourceArtifact"
+              Configuration:
+                BranchName: master
+                PollForSourceChanges: true
+                RepositoryName: !Ref CodeRepository
+              # utputArtifacts:
+              #    - Name: "SourceArtifact"
+              RunOrder: 1
+        - Name: Athena-Service
+          Actions:
+            - Name: DeployAction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: UAT-AthenaFunctions
+                TemplatePath: SourceArtifact::Common-AthenaFunctions.yaml
+                TemplateConfiguration: SourceArtifact::Tags-Template-Configuration.json
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !GetAtt CodePipelineAwsServiceRole.Arn
+              Region: us-west-2
+              InputArtifacts:
+                - Name: "SourceArtifact"
+                # ApplicationName: !Ref codedeploy
+                # DeploymentGroupName: !Ref codedeploygroup
+              RunOrder: 1
+        - Name: API-Gateway-Service
+          Actions:
+            - Name: DeployAction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: UAT-API-Gateway
+                TemplatePath: SourceArtifact::Application-API-GateWay.yaml
+                TemplateConfiguration: SourceArtifact::Tags-Template-Configuration.json
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !GetAtt CodePipelineAwsServiceRole.Arn
+              Region: us-west-2
+              InputArtifacts:
+                - Name: "SourceArtifact"
+                # ApplicationName: !Ref codedeploy
+                # DeploymentGroupName: !Ref codedeploygroup
+              RunOrder: 1
+        - Name: CICD-Application-Instance
+          Actions:
+            - Name: DeployAction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: UAT-CICD-Application-Instance
+                TemplatePath: SourceArtifact::Application-CICD-Application-Instance.yaml
+                TemplateConfiguration: SourceArtifact::Tags-Template-Configuration.json
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !GetAtt CodePipelineAwsServiceRole.Arn
+              Region: us-west-2
+              InputArtifacts:
+                - Name: "SourceArtifact"
+                # ApplicationName: !Ref codedeploy
+                # DeploymentGroupName: !Ref codedeploygroup
+              RunOrder: 1
+        - Name: CICD-User-Policy
+          Actions:
+            - Name: DeployAction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: UAT-CICD-User-Policy
+                TemplatePath: SourceArtifact::Application-CICD-User-Policy.yaml
+                TemplateConfiguration: SourceArtifact::Tags-Template-Configuration.json
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !GetAtt CodePipelineAwsServiceRole.Arn
+              Region: us-west-2
+              InputArtifacts:
+                - Name: "SourceArtifact"
+                # ApplicationName: !Ref codedeploy
+                # DeploymentGroupName: !Ref codedeploygroup
+              RunOrder: 1
+        - Name: Redshift-Database
+          Actions:
+            - Name: DeployAction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: UAT-Redshift-Database
+                TemplatePath: SourceArtifact::Application-Redshift-Database.yaml
+                TemplateConfiguration: SourceArtifact::Tags-Template-Configuration.json
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !GetAtt CodePipelineAwsServiceRole.Arn
+              Region: us-west-2
+              InputArtifacts:
+                - Name: "SourceArtifact"
+                # ApplicationName: !Ref codedeploy
+                # DeploymentGroupName: !Ref codedeploygroup
+              RunOrder: 1
+        - Name: MariaDB-Database
+          Actions:
+            - Name: DeployAction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: UAT-MariaDB-Database
+                TemplatePath: SourceArtifact::Application-MariaDB-Database.yaml
+                TemplateConfiguration: SourceArtifact::Tags-Template-Configuration.json
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !GetAtt CodePipelineAwsServiceRole.Arn
+              Region: us-west-2
+              InputArtifacts:
+                - Name: "SourceArtifact"
+                # ApplicationName: !Ref codedeploy
+                # DeploymentGroupName: !Ref codedeploygroup
+              RunOrder: 1
+  AmazonCloudWatchEventRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: code-pipeline-execution
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'codepipeline:StartPipelineExecution'
+                Resource:
+                  - !Join
+                    - ''
+                    - - 'arn:aws:codepipeline:'
+                      - !Ref 'AWS::Region'
+                      - ':'
+                      - !Ref 'AWS::AccountId'
+                      - ':'
+                      - !Ref Codepipeline
+  AmazonCloudWatchEventRuleResourceCp:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      EventPattern:
+        source:
+          - aws.codecommit
+        detail-type:
+          - CodeCommit Repository State Change
+        resources:
+          - !Join
+            - ''
+            - - 'arn:aws:codecommit:'
+              - !Ref 'AWS::Region'
+              - ':'
+              - !Ref 'AWS::AccountId'
+              - ':'
+              - !GetAtt
+                - CodeRepository
+                - Name
+        detail:
+          event:
+            - referenceCreated
+            - referenceUpdated
+          referenceType:
+            - branch
+          referenceName:
+            - master
+      Targets:
+        - Arn: !Join
+            - ''
+            - - 'arn:aws:codepipeline:'
+              - !Ref 'AWS::Region'
+              - ':'
+              - !Ref 'AWS::AccountId'
+              - ':'
+              - !Ref Codepipeline
+          RoleArn: !GetAtt
+            - AmazonCloudWatchEventRole
+            - Arn
+          Id: codepipeline-Codepipeline

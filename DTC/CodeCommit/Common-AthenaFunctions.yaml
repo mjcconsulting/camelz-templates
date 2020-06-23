@@ -1,0 +1,485 @@
+AWSTemplateFormatVersion: 2010-09-09
+2	Description: Common-AthenaFunctions Template.
+3	  This creates Lambda Functions related to Athena DataBase, Table, WorkGroup.
+4	Metadata:
+5	  AWS::CloudFormation::Interface:
+6	    ParameterGroups:
+7	      - Label:
+8	          default: Environment Configuration
+9	        Parameters:
+10	          - EnvironmentType
+11	      - Label:
+12	          default: Stack Dependencies
+13	        Parameters:
+14	          - LayersStackName
+15	          - BucketsStackName
+16	          - TopicsStackName
+17	      - Label:
+18	          default: Function Configuration
+19	        Parameters:
+20	          - LogRetention
+21	    ParameterLabels:
+22	      EnvironmentType:
+23	        default: environment type
+24	      LayersStackName:
+25	        default: Layers Stack Name
+26	      BucketsStackName:
+27	        default: Buckets Stack Name
+28	      TopicsStackName:
+29	        default: Topics Stack Name
+30	      LogRetention:
+31	        default: Log Retention
+32	Parameters:
+33	  EnvironmentType:
+34	    Description: Enter in Which region Analitics action will perform.
+35	    Type: String
+36	    Default: 'micro'
+37	  LayersStackName:
+38	    Description: Name of the CloudFormation Stack containing Layers
+39	    Type: String
+40	    MinLength: 2
+41	    MaxLength: 64
+42	    Default: Layers
+43	    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+44	    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+45	  BucketsStackName:
+46	    Description: Name of the CloudFormation Stack containing Buckets
+47	    Type: String
+48	    MinLength: 2
+49	    MaxLength: 64
+50	    Default: Buckets
+51	    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+52	    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+53	  TopicsStackName:
+54	    Description: Name of the CloudFormation Stack containing Topics
+55	    Type: String
+56	    MinLength: 2
+57	    MaxLength: 64
+58	    Default: Topics
+59	    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+60	    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+61	  LogRetention:
+62	    Description: Number of days to retain CloudWatch Log Events for all AMI Lookup Lambda Functions
+63	    Type: Number
+64	    Default: 30
+65	    AllowedValues:
+66	      - 1
+67	      - 3
+68	      - 5
+69	      - 7
+70	      - 14
+71	      - 30
+72	      - 60
+73	      - 90
+74	    ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
+75	Resources:
+76	  AthenaQueryRole:
+77	    Type: AWS::IAM::Role
+78	    Properties:
+79	      AssumeRolePolicyDocument:
+80	        Statement:
+81	          - Action:
+82	              - 'sts:AssumeRole'
+83	            Effect: Allow
+84	            Principal:
+85	              Service:
+86	                - lambda.amazonaws.com
+87	        Version: 2012-10-17
+88	      Policies:
+89	        - PolicyDocument:
+90	            Statement:
+91	              - Action:
+92	                  - "logs:CreateLogGroup"
+93	                  - "logs:CreateLogStream"
+94	                  - "logs:PutLogEvents"
+95	                  - "ec2:CreateNetworkInterface"
+96	                  - "ec2:DescribeNetworkInterfaces"
+97	                  - "ec2:DeleteNetworkInterface"
+98	                  - "lambda:InvokeFunction"
+99	                  - "lambda:InvokeAsync"
+100	                  - "lambda:ListVersionsByFunction"
+101	                  - "lambda:ListTags"
+102	                  - "lambda:GetFunction"
+103	                  - "lambda:ListAliases"
+104	                  - "lambda:GetFunctionConfiguration"
+105	                  - "lambda:GetAlias"
+106	                  - "lambda:GetPolicy"
+107	                  - "logs:*"
+108	                Effect: Allow
+109	                Resource:
+110	                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+111	            Version: 2012-10-17
+112	          PolicyName: lambda-log-access
+113	        - PolicyDocument:
+114	            Statement:
+115	              - Action:
+116	                  - 'athena:StartQueryExecution'
+117	                  - 'athena:GetExecutionEngine'
+118	                  - 'athena:GetExecutionEngines'
+119	                  - 'athena:GetQueryExecution'
+120	                  - 'athena:ListWorkGroups'
+121	                  - 'athena:GetTables'
+122	                  - 'athena:GetTables'
+123	                  - 'athena:GetNamespace'
+124	                  - 'athena:GetNamespaces'
+125	                  - 'athena:GetCatalogs'
+126	                  - 'athena:RunQuery'
+127	                Effect: Allow
+128	                Resource:
+129	                  - '*'
+130	              - Action:
+131	                  - 's3:*'
+132	                Effect: Allow
+133	                Resource:
+134	                  - '*'
+135	              - Action:
+136	                  - 'athena:*'
+137	                Effect: Allow
+138	                Resource:
+139	                  - 'arn:aws:athena:*:*:workgroup/*'
+140	            Version: 2012-10-17
+141	          PolicyName: lambda-athena-access
+142	      ManagedPolicyArns:
+143	        - 'arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess'
+144	        # - Sid: VisualEditor1
+145	        #   Effect: Allow
+146	        #   Action: 'athena:*'
+147	        #   Resource: 'arn:aws:athena:*:*:workgroup/*'
+148	  AthenaDBLogGroup:
+149	    Type: AWS::Logs::LogGroup
+150	    Properties:
+151	      LogGroupName: /aws/lambda/AthenaDB
+152	      RetentionInDays: !Ref LogRetention
+153	  AthenaDBFunction:
+154	    Type: AWS::Lambda::Function
+155	    Properties:
+156	      FunctionName: AthenaDataBase
+157	      Description: A Lambda function that Creates DataBase in Athena.
+158	      Role: !GetAtt AthenaQueryRole.Arn
+159	      Runtime: nodejs12.x
+160	      Timeout: 30
+161	      # Layers:
+162	      #   - !ImportValue
+163	      #       Fn::Sub: ${LayersStackName}-AsyncCustomResourceLayerVersionArn
+164	      Handler: index.handler
+165	      Code:
+166	        ZipFile: |
+167	          const responsePromise = require('cfn-response')
+168	          const AWS = require('aws-sdk')
+169	          const athena = new AWS.Athena()
+170	          const s3 = new AWS.S3()
+171	          AWS.config.apiVersions = {
+172	            ec2: '2016-11-15'
+173	          }
+174	          function check_state (id, callback) {
+175	            var interval = setInterval(() => {
+176	                athena.getQueryResults({ QueryExecutionId: id }).promise().then(data => {
+177	                console.info(`QueryResponse: \n${JSON.stringify(data)}`)
+178	                const execution_state = data.QueryExecution.Status.State
+179	                if (['SUCCEEDED', 'FAILED', 'CANCELLED'].includes(execution_state)) {
+180	                  clearInterval(interval)
+181	                  callback(execution_state === 'SUCCEEDED')
+182	                }
+183	              })},
+184	              1000
+185	            )
+186	          }
+187	          exports.handler = async (event, context) => {
+188	            console.info(`Got Event:\n${JSON.stringify(event)}`)
+189	            const props = event.ResourceProperties
+190	            const tmp_bucket = 'athena-output-dxcapu-us-west-2/'
+191	            const regex = /[^A-Za-z0-9]+/g
+192	            const database_name = 'dxcclinetsdatabase'
+193	            const database_result = 's3://' + tmp_bucket
+194	            async function sendResponse (isSuccess, responseData = {}) {
+195	              responsePromise && responsePromise.send(
+196	                event,
+197	                context,
+198	                isSuccess ? responsePromise.SUCCESS : responsePromise.FAILED,
+199	                responseData
+200	              )
+201	            }
+202	            function handleError (err) {
+203	              const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`}
+204	              console.error(responseData.Error)
+205	              sendResponse(false, responseData)
+206	            }
+207	            switch (event.RequestType) {
+208	              case 'Create':
+209	                const query = `CREATE DATABASE IF NOT EXISTS ${database_name} LOCATION '${database_result}/'`
+210	                console.info('Execute: ' + query)
+211	                await athena.startQueryExecution({
+212	                  QueryString: query,
+213	                  ResultConfiguration: {
+214	                    OutputLocation: database_result + '/output'
+215	                  }
+216	                }).promise().then(data => {
+217	                  console.info(`ExecuteResponse: \n${JSON.stringify(data)}`)
+218	                  check_state(data.QueryExecutionId, isSuccess => { sendResponse(isSuccess) })
+219	                }).catch(handleError)
+220	                break
+221	              case 'Update':
+222	                await sendResponse(true)
+223	                break
+224	              case 'Delete':
+225	                const deleteQuery = 'DROP DATABASE' + database_name
+226	                console.info('Execute: ' + deleteQuery)
+227	                athena.startQueryExecution({
+228	                  QueryString: deleteQuery,
+229	                  ResultConfiguration: {
+230	                    OutputLocation: database_result + '/output'
+231	                  }
+232	                }).promise().then(data => {
+233	                  console.info(`ExecuteResponse: \n${JSON.stringify(data)}`)
+234	                  check_state(data.QueryExecutionId, isSuccess => {
+235	                    if (isSuccess) {
+236	                      s3.listObjects({ Bucket: tmp_bucket }).promise().then(data => {
+237	                        s3.deleteObjects({ Bucket: tmp_bucket, Delete: data.contents }).promise().then(() => {
+238	                          sendResponse(true)
+239	                        }).catch(handleError)
+240	                      }).catch(handleError)
+241	                    }
+242	                  })
+243	                }).catch(handleError)
+244	                break
+245	              default:
+246	                console.error('Unable to complete CFN request: ' + event.RequestType)
+247	                await sendResponse(false)
+248	            }
+249	          }
+250	    DependsOn: AthenaDBLogGroup
+251	  AthenaTableLogGroup:
+252	    Type: AWS::Logs::LogGroup
+253	    Properties:
+254	      LogGroupName: /aws/lambda/AthenaTable
+255	      RetentionInDays: !Ref LogRetention
+256	  AthenaTableFunction:
+257	    Type: AWS::Lambda::Function
+258	    Properties:
+259	      FunctionName: AthenaTable
+260	      Description: A Lambda function that Create tables in Athena.
+261	      Role: !GetAtt AthenaQueryRole.Arn
+262	      Runtime: nodejs12.x
+263	      Timeout: 30
+264	      # Layers:
+265	      #   - !ImportValue
+266	      #       Fn::Sub: ${LayersStackName}-AsyncCustomResourceLayerVersionArn
+267	      Handler: index.handler
+268	      Code:
+269	        ZipFile: |
+270	          const responsePromise = require('cfn-response')
+271	          const AWS = require('aws-sdk')
+272	          const athena = new AWS.Athena()
+273	          const s3 = new AWS.S3()
+274	          AWS.config.apiVersions = {
+275	            ec2: '2016-11-15'
+276	          }
+277	          function check_state (id, callback) {
+278	            var interval = setInterval(() => {
+279	              athena.getQueryResults({ QueryExecutionId: id }).promise().then(data => {
+280	                console.info(`QueryResponse: \n${JSON.stringify(data)}`)
+281	                const execution_state = data.QueryExecution.Status.State
+282	                if (['SUCCEEDED', 'FAILED', 'CANCELLED'].includes(execution_state)) {
+283	                  clearInterval(interval)
+284	                  callback(execution_state === 'SUCCEEDED')
+285	                }
+286	              })
+287	            }, 1000)
+288	          }
+289	          exports.handler = async (event, context) => {
+290	            console.info(`Got Event:\n${JSON.stringify(event)}`)
+291	            const props = event.ResourceProperties
+292	            const tmp_bucket = 'athena-output-dxcapu-us-west-2/'
+293	            const regex = /[^A-Za-z0-9]+/g
+294	            const database_name = 'dxcclinetsdatabase'
+295	            const database_result = 's3://' + tmp_bucket
+296	            async function sendResponse (isSuccess, responseData = {}) {
+297	              responsePromise && responsePromise.send(
+298	                event,
+299	                context,
+300	                isSuccess ? responsePromise.SUCCESS : responsePromise.FAILED,
+301	                responseData
+302	              )
+303	            }
+304	            function handleError (err) {
+305	              const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`}
+306	              console.error(responseData.Error)
+307	              sendResponse(false, responseData)
+308	            }
+309	            switch (event.RequestType) {
+310	              case 'Create':
+311	                const query = `
+312	                  CREATE EXTERNAL TABLE IF NOT EXISTS ${database_name}.client_data (col0 string, col1 string, col2 string, col3 string, col4 string, col5 string )
+313	                            ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+314	                            WITH SERDEPROPERTIES (
+315	                              'serialization.format' = ',',
+316	                              'field.delim' = ','
+317	                              ) LOCATION 's3://centralized-clients-input-data-dxcapu-us-west-2/iris/'
+318	                              TBLPROPERTIES ('has_encrypted_data'='false');
+319	                `
+320	                console.info('Execute: ' + query)
+321	                await athena.startQueryExecution({
+322	                  QueryString: query,
+323	                  ResultConfiguration: {
+324	                    OutputLocation: database_result + '/output'
+325	                  }
+326	                }).promise().then(data => {
+327	                  console.info(`ExecuteResponse: \n${JSON.stringify(data)}`)
+328	                  check_state(data.QueryExecutionId, isSuccess => { sendResponse(isSuccess) })
+329	                }).catch(handleError)
+330	                break
+331	              case 'Update':
+332	                await sendResponse(true)
+333	                break
+334	              case 'Delete':
+335	                const deleteQuery = `DROP TABLE ${database_name}.clinet_data`
+336	                console.info('Execute: ' + deleteQuery)
+337	                await athena.startQueryExecution({
+338	                  QueryString: deleteQuery,
+339	                  ResultConfiguration: {
+340	                    OutputLocation: database_result + '/output'
+341	                  }
+342	                }).promise().then(data => {
+343	                  console.info(`ExecuteResponse: \n${JSON.stringify(data)}`)
+344	                  check_state(data.QueryExecutionId, isSuccess => { sendResponse(isSuccess) })
+345	                }).catch(handleError)
+346	                break
+347	              default:
+348	                console.error('Unable to complete CFN request: ' + event.RequestType)
+349	                await sendResponse(false)
+350	            }
+351	          }
+352	    DependsOn: AthenaTableLogGroup
+353	  AthenaWorkGroupLogGroup:
+354	    Type: AWS::Logs::LogGroup
+355	    Properties:
+356	      LogGroupName: /aws/lambda/AthenaQueryWorkGroup
+357	      RetentionInDays: !Ref LogRetention
+358	  AthenaWorkGroupFunction:
+359	    Type: AWS::Lambda::Function
+360	    Properties:
+361	      FunctionName: AthenaWorkGroup
+362	      Description: A Lambda function that Creates WorkGroup in Athena.
+363	      Role: !GetAtt AthenaQueryRole.Arn
+364	      Runtime: nodejs12.x
+365	      Timeout: 30
+366	      Layers:
+367	        - !ImportValue
+368	            Fn::Sub: ${LayersStackName}-AsyncCustomResourceLayerVersionArn
+369	      Handler: index.handler
+370	      Code:
+371	        ZipFile: |
+372
+373	          const responsePromise = require('cfn-response-promise')
+374	          const AWS = require("aws-sdk");
+375	          AWS.config.apiVersions = {
+376	            ec2: '2016-11-15'
+377	          };
+378	          const client = new AWS.Athena()
+379	          exports.handler = async (event, context) => {
+380	            async function sendResponse (isSuccess, responseData = {}) {
+381	              responsePromise && await responsePromise.send(
+382	                event,
+383	                context,
+384	                isSuccess ? responsePromise.SUCCESS : responsePromise.FAILED,
+385	                responseData
+386	              )
+387	            }
+388	            function handleError (err) {
+389	              const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`}
+390	              console.error(responseData.Error)
+391	              sendResponse(false, responseData)
+392	            }
+393	            console.info(`Got Event:\n${JSON.stringify(event)}`)
+394	            switch (event.RequestType) {
+395	              case 'Create':
+396	              case 'Update':
+397	                console.log('Creating Workgroup')
+398	                try {
+399	                  var params={
+400	                    Name:'DevelopmentEnvironment',
+401	                    Configuration: {
+402	                      EnforceWorkGroupConfiguration: false,
+403	                      PublishCloudWatchMetricsEnabled: true,
+404	                      ResultConfiguration: {
+405	                        OutputLocation: "s3://athena-outputs-dxcapu-us-west-2"
+406	                      },
+407	                    },
+408	                    Description: 'This Work-Group Assigned to Develpers for Running Query',
+409	                    Tags:[
+410	                        {
+411	                            'Key': 'company',
+412	                            'Value': 'dxc'
+413	                        },
+414	                    ]
+415	                  }
+416	                  await client.createWorkGroup(params).promise().then(async data => {
+417	                    console.info(`Workgroup created successfully: \n${JSON.stringify(data)}`)
+418	                    await sendResponse(true)
+419	                  }).catch(handleError)
+420	                }
+421	                catch (err) {
+422	                  handleError(err)
+423	                }
+424	                break;
+425	              case 'Delete':
+426	                await sendResponse(true)
+427	                break;
+428	              default:
+429	                console.error('Unable to complete CFN request: ' + event.RequestType)
+430	                await sendResponse(false)
+431	            }
+432	          }
+433	    DependsOn: AthenaWorkGroupLogGroup
+434	  TableAlarm:
+435	    Type: AWS::CloudWatch::Alarm
+436	    Properties:
+437	      AlarmDescription: The Athena Service creates Cloudwatchmertics.
+438	      AlarmActions:
+439	        - !ImportValue
+440	          Fn::Sub: ${TopicsStackName}-AlarmsTopic
+441	      Namespace: AWS/Athena
+442	      MetricName: TotalExecutionTime
+443	      Unit: Kilobytes/Second
+444	      Statistic: Average
+445	      Period: 60
+446	      EvaluationPeriods: 1
+447	      Threshold: 50
+448	      ComparisonOperator: GreaterThanThreshold
+449	      Dimensions:
+450	        - Name: AthenaIdentifier
+451	          Value: !Ref AthenaTableFunction
+452	  WorkGroupAlarm:
+453	    Type: AWS::CloudWatch::Alarm
+454	    Properties:
+455	      AlarmDescription: The Athena Service creates Cloudwatchmertics.
+456	      AlarmActions:
+457	        - !ImportValue
+458	          Fn::Sub: ${TopicsStackName}-AlarmsTopic
+459	      Namespace: AWS/Athena
+460	      MetricName: WorkGroup
+461	      Unit: Kilobytes/Second
+462	      Statistic: Average
+463	      Period: 60
+464	      EvaluationPeriods: 1
+465	      Threshold: 60
+466	      ComparisonOperator: GreaterThanThreshold
+467	      Dimensions:
+468	        - Name: WorkGroupIdentifier
+469	          Value: !Ref AthenaWorkGroupFunction
+470	Outputs:
+471	  AthenaDBFunctionArn:
+472	    Description: The AthenaDB Function ARN
+473	    Value: !GetAtt AthenaDBFunction.Arn
+474	    Export:
+475	      Name: !Sub ${AWS::StackName}-AthenaDBFunctionArn
+476	  AthenaTableFunctionArn:
+477	    Description: The Athena Table Function ARN
+478	    Value: !GetAtt AthenaTableFunction.Arn
+479	    Export:
+480	      Name: !Sub ${AWS::StackName}-AthenaTableFunctionArn
+481	  AthenaWorkGroupFunctionArn:
+482	    Description: The Athena Work Group Function ARN
+483	    Value: !GetAtt AthenaWorkGroupFunction.Arn
+484	    Export:
+485	      Name: !Sub ${AWS::StackName}-AthenaWorkGroupFunctionArn

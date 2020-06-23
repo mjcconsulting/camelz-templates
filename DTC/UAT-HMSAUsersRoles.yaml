@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Identity-Active Directory HMSA Users Roles Template.
+  This creates Active Directory IAM Roles. These is Application specific - Roles created here are for Federated Identity and Cross-Account Access. to insure IAM Users and Federated Users have the same permissions.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - HMSAManagedPoliciesStackName
+    ParameterLabels:
+      HMSAManagedPoliciesStackName:
+        default: HMSA Managed Policies Stack Name
+Parameters:
+  HMSAManagedPoliciesStackName:
+    Description: Name of the CloudFormation Stack containing ManagedPolicies
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: HMSAManagedPolicies
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+Resources:
+  HMSADeveloperRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hmsa_developers
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ec2.amazonaws.com
+              - codepipeline.amazonaws.com
+              - codebuild.amazonaws.com
+              - codedeploy.amazonaws.com
+              - apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSACodeCommitUserPolicy
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSACodeBuildUserPolicy
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSACodeDeployUserPolicy
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSACodePipelineUserPolicy
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSARedshiftUserPolicy
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSAAPIUserPolicy
+  HMSATesterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hmsa_testers
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ec2.amazonaws.com
+              - codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSACodeBuildUserPolicy
+  HMSABUsinessUsersRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hmsa_businessusers
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ec2.amazonaws.com
+              - codepipeline.amazonaws.com
+              - codedeploy.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSACodeDeployUserPolicy
+        - !ImportValue
+          Fn::Sub: ${HMSAManagedPoliciesStackName}-HMSACodePipelineUserPolicy
+Outputs:
+  HMSADeveloperRole:
+    Description: The HMSADeveloperRole Name
+    Value: !Ref HMSADeveloperRole
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSADeveloperRole
+  HMSATesterRole:
+    Description: The HMSATesterRole Name
+    Value: !Ref HMSATesterRole
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSATesterRole
+  HMSABUsinessUsersRole:
+    Description: The HMSABUsinessUsersRole Name
+    Value: !Ref HMSABUsinessUsersRole
+    Export:
+      Name: !Sub ${AWS::StackName}-HMSABUsinessUsersRole

@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Identity-Active Directory Users Roles Template.
+  This creates Active Directory IAM Roles. These are not Application specific - Roles created here are for Federated Identity and Cross-Account Access. to insure IAM Users and Federated Users have the same permissions.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - ManagedPoliciesStackName
+    ParameterLabels:
+      ManagedPoliciesStackName:
+        default: Managed Policies Stack Name
+Parameters:
+  ManagedPoliciesStackName:
+    Description: Name of the CloudFormation Stack containing ManagedPolicies
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: ManagedPolicies
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+Resources:
+  DapAdministratorsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: dap_administrators
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:saml-provider/dag
+            Action: 'sts:AssumeRoleWithSAML'
+            Condition:
+              StringEquals:
+                'SAML:aud': 'https://signin.aws.amazon.com/saml'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+  DapSystemAdministratorsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: dap_system_administrators
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:saml-provider/dag
+            Action: 'sts:AssumeRoleWithSAML'
+            Condition:
+              StringEquals:
+                'SAML:aud': 'https://signin.aws.amazon.com/saml'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+  DapDevelopersRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: dap_developers
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:saml-provider/dag
+            Action: 'sts:AssumeRoleWithSAML'
+            Condition:
+              StringEquals:
+                'SAML:aud': 'https://signin.aws.amazon.com/saml'
+      ManagedPolicyArns:
+        - !ImportValue
+          Fn::Sub: ${ManagedPoliciesStackName}-DeveloperAccess
+        - !ImportValue
+          Fn::Sub: ${ManagedPoliciesStackName}-UserSelfManagementAccess
+Outputs:
+  DapAdministratorsRole:
+    Description: The DapAdministratorsRole Name
+    Value: !Ref DapAdministratorsRole
+    Export:
+      Name: !Sub ${AWS::StackName}-DapAdministratorsRole
+  DapSystemAdministratorsRole:
+    Description: The DapSystemAdministratorsRole Name
+    Value: !Ref DapSystemAdministratorsRole
+    Export:
+      Name: !Sub ${AWS::StackName}-DapSystemAdministratorsRole
+  DapDevelopersRole:
+    Description: The DapDevelopersRole Name
+    Value: !Ref DapDevelopersRole
+    Export:
+      Name: !Sub ${AWS::StackName}-DapDevelopersRole
