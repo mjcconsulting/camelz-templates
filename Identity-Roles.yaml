@@ -205,6 +205,24 @@ Resources:
         - !ImportValue
           Fn::Sub: ${ManagedPoliciesStackName}-UserFolderAccess
     Condition: ConfigureSamlRoles
+  ManagedInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ManagedInstance
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonSSMDirectoryServiceAccess
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
 Outputs:
   AdministratorsRole:
     Description: The AdministratorsRole Name
@@ -254,3 +272,8 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}-UsersRole
     Condition: ConfigureSamlRoles
+  ManagedInstanceRole:
+    Description: The ManagedInstanceRole Name
+    Value: !Ref ManagedInstanceRole
+    Export:
+      Name: !Sub ${AWS::StackName}-ManagedInstanceRole

@@ -23,6 +23,11 @@ Resources:
               - iam:ListRoles
               - iam:GetRole
             Resource: '*'
+          - Sid: AllowDescribeTransitGateways
+            Effect: Allow
+            Action:
+              - ec2:DescribeTransitGateways
+            Resource: '*'
           - Sid: AllowDescribeVpcs
             Effect: Allow
             Action:

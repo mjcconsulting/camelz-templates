@@ -542,6 +542,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - ram:GetResourceShares
+                  - ram:GetResourceShareInvitations
+                  - ram:AcceptResourceShareInvitation
                   - ram:ListResources
                   - ec2:DescribeTransitGateways
                 Resource: '*'

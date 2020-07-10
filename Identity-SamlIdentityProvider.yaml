@@ -17,7 +17,7 @@ Metadata:
           - SamlProviderMetadata
           - SamlProviderMetadataUrl
           - SamlProviderAccessMethod
-          - SamlProviderMasterAccount
+          - SamlProviderMasterAccountId
     ParameterLabels:
       MetadataDownloaderLogRetention:
         default: MetadataDownloader Log Retention
@@ -33,8 +33,8 @@ Metadata:
         default: SAML Provider Metadata URL
       SamlProviderAccessMethod:
         default: SAML Provider Access Method
-      SamlProviderMasterAccount:
-        default: SAML Provider Master Account
+      SamlProviderMasterAccountId:
+        default: SAML Provider Master Account ID
 Parameters:
   MetadataDownloaderLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the MetadataDownloader Lambda Function
@@ -97,7 +97,7 @@ Parameters:
       - master
       - child
     ConstraintDescription: must be single, master or child.
-  SamlProviderMasterAccount:
+  SamlProviderMasterAccountId:
     Description: AWS Account ID of the SAML Provider Master Account
     Type: String
     Default: ''
@@ -118,11 +118,11 @@ Rules:
     Assertions:
       - Assert: !Not [ !Equals [ !Ref SamlProviderMetadataUrl, '' ]]
         AssertDescription: SamlProviderMetadataUrl required when SamlProviderMetadata is blank
-  ValidateSamlProviderMasterAccount:
+  ValidateSamlProviderMasterAccountId:
     RuleCondition: !Equals [ !Ref SamlProviderAccessMethod, child ]
     Assertions:
-      - Assert: !Not [ !Equals [ !Ref SamlProviderMasterAccount, '' ]]
-        AssertDescription: SamlProviderMasterAccount required when SamlProviderAccessMethod is child
+      - Assert: !Not [ !Equals [ !Ref SamlProviderMasterAccountId, '' ]]
+        AssertDescription: SamlProviderMasterAccountId required when SamlProviderAccessMethod is child
 Conditions:
   ConfigureGlobal: !Equals [ !Ref 'AWS::Region', us-east-1 ]
   ConfigureOkta: !Equals [ !Ref SamlProviderType, okta ]
@@ -393,7 +393,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: !Sub arn:aws:iam::${SamlProviderMasterAccount}:root
+              AWS: !Sub arn:aws:iam::${SamlProviderMasterAccountId}:root
             Action:
               - sts:AssumeRole
       Policies:

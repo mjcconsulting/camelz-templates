@@ -11,48 +11,51 @@ Metadata:
       - Label:
           default: Account Dependencies
         Parameters:
-          - OrganizationAccount
-          - JumpstartAccount
-          - ManagementAccount
-          - LogAccount
-          - RecoveryAccount
-          - BuildAccount
-          - CoreAccount
-          - ProductionAccount
-          - StagingAccount
-          - UATAccount
-          - QAAccount
-          - TestingAccount
-          - DevelopmentAccount
+          - OrganizationAccountId
+          - JumpstartAccountId
+          - ManagementAccountId
+          - CoreAccountId
+          - LogAccountId
+          - BuildAccountId
+          - ProductionAccountId
+          - NonProductionAccountId
+          - RecoveryAccountId
+          - StagingAccountId
+          - UATAccountId
+          - QAAccountId
+          - TestingAccountId
+          - DevelopmentAccountId
     ParameterLabels:
       MultiAccountManagedPoliciesStackName:
         default: Multi-Account ManagedPolicies Stack Name
-      OrganizationAccount:
-        default: Organization Account
-      JumpstartAccount:
-        default: Jumpstart Account
-      ManagementAccount:
-        default: Management Account
-      LogAccount:
-        default: Log Account
-      RecoveryAccount:
-        default: Recovery Account
-      BuildAccount:
-        default: Build Account
-      CoreAccount:
-        default: Core Account
-      ProductionAccount:
-        default: Production Account
-      StagingAccount:
-        default: Staging Account
-      UATAccount:
-        default: UAT Account
-      QAAccount:
-        default: QA Account
-      TestingAccount:
-        default: Testing Account
-      DevelopmentAccount:
-        default: Development Account
+      OrganizationAccountId:
+        default: Organization Account ID
+      JumpstartAccountId:
+        default: Jumpstart Account ID
+      ManagementAccountId:
+        default: Management Account ID
+      CoreAccountId:
+        default: Core Account ID
+      LogAccountId:
+        default: Log Account ID
+      BuildAccountId:
+        default: Build Account ID
+      ProductionAccountId:
+        default: Production Account ID
+      NonProductionAccountId:
+        default: NonProduction Account ID
+      RecoveryAccountId:
+        default: Recovery Account ID
+      StagingAccountId:
+        default: Staging Account ID
+      UATAccountId:
+        default: UAT Account ID
+      QAAccountId:
+        default: QA Account ID
+      TestingAccountId:
+        default: Testing Account ID
+      DevelopmentAccountId:
+        default: Development Account ID
 Parameters:
   MultiAccountManagedPoliciesStackName:
     Description: Name of the CloudFormation Stack containing Multi-Account ManagedPolicies
@@ -62,79 +65,85 @@ Parameters:
     Default: MultiAccountManagedPolicies
     AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
-  OrganizationAccount:
+  OrganizationAccountId:
     Description: AWS Account ID of the Organization Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  JumpstartAccount:
+  JumpstartAccountId:
     Description: AWS Account ID of the Jumpstart Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  ManagementAccount:
+  ManagementAccountId:
     Description: AWS Account ID of the Management Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  LogAccount:
-    Description: AWS Account ID of the Log Account
-    Type: String
-    Default: ''
-    AllowedPattern: (^$|^[0-9]{12}$)
-    ConstraintDescription: must be a valid AWS Account ID, or blank.
-  RecoveryAccount:
-    Description: AWS Account ID of the Recovery Account
-    Type: String
-    Default: ''
-    AllowedPattern: (^$|^[0-9]{12}$)
-    ConstraintDescription: must be a valid AWS Account ID, or blank.
-  BuildAccount:
-    Description: AWS Account ID of the Build Account
-    Type: String
-    Default: ''
-    AllowedPattern: (^$|^[0-9]{12}$)
-    ConstraintDescription: must be a valid AWS Account ID, or blank.
-  CoreAccount:
+  CoreAccountId:
     Description: AWS Account ID of the Core Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  ProductionAccount:
+  LogAccountId:
+    Description: AWS Account ID of the Log Account
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^[0-9]{12}$)
+    ConstraintDescription: must be a valid AWS Account ID, or blank.
+  BuildAccountId:
+    Description: AWS Account ID of the Build Account
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^[0-9]{12}$)
+    ConstraintDescription: must be a valid AWS Account ID, or blank.
+  ProductionAccountId:
     Description: AWS Account ID of the Production Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  StagingAccount:
+  NonProductionAccountId:
+    Description: AWS Account ID of the NonProduction Account
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^[0-9]{12}$)
+    ConstraintDescription: must be a valid AWS Account ID, or blank.
+  RecoveryAccountId:
+    Description: AWS Account ID of the Recovery Account
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^[0-9]{12}$)
+    ConstraintDescription: must be a valid AWS Account ID, or blank.
+  StagingAccountId:
     Description: AWS Account ID of the Staging Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  UATAccount:
+  UATAccountId:
     Description: AWS Account ID of the UAT Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  QAAccount:
+  QAAccountId:
     Description: AWS Account ID of the QA Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  TestingAccount:
+  TestingAccountId:
     Description: AWS Account ID of the Testing Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  DevelopmentAccount:
+  DevelopmentAccountId:
     Description: AWS Account ID of the Development Account
     Type: String
     Default: ''
@@ -146,33 +155,36 @@ Rules:
       - Assert: !Equals [ !Ref 'AWS::Region', us-east-1 ]
         AssertDescription: This Template can only be used in Region us-east-1.
 Conditions:
-  ConfigureOrganizationRoles: !Equals [ !Ref OrganizationAccount, !Ref 'AWS::AccountId' ]
-  ConfigureOrganizationAccount: !Not [ !Equals [ !Ref OrganizationAccount, '' ]]
-  ConfigureJumpstartRoles: !Equals [ !Ref JumpstartAccount, !Ref 'AWS::AccountId' ]
-  ConfigureJumpstartAccount: !Not [ !Equals [ !Ref JumpstartAccount, '' ]]
-  ConfigureManagementRoles: !Equals [ !Ref ManagementAccount, !Ref 'AWS::AccountId' ]
-  ConfigureManagementAccount: !Not [ !Equals [ !Ref ManagementAccount, '' ]]
+  ConfigureOrganizationRoles: !Equals [ !Ref OrganizationAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureOrganizationAccount: !Not [ !Equals [ !Ref OrganizationAccountId, '' ]]
+  ConfigureOrganizationDomainNameServersRole: !And [ !Condition ConfigureOrganizationRoles, !Condition ConfigureJumpstartAccount ]
+  ConfigureJumpstartRoles: !Equals [ !Ref JumpstartAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureJumpstartAccount: !Not [ !Equals [ !Ref JumpstartAccountId, '' ]]
+  ConfigureManagementRoles: !Equals [ !Ref ManagementAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureManagementAccount: !Not [ !Equals [ !Ref ManagementAccountId, '' ]]
   ConfigureManagementDomainRoles: !And [ !Condition ConfigureManagementRoles, !Not [ !Condition ConfigureOrganizationAccount ]]
-  ConfigureLogRoles: !Equals [ !Ref LogAccount, !Ref 'AWS::AccountId' ]
-  ConfigureLogAccount: !Not [ !Equals [ !Ref LogAccount, '' ]]
-  ConfigureRecoveryRoles: !Equals [ !Ref RecoveryAccount, !Ref 'AWS::AccountId' ]
-  ConfigureRecoveryAccount: !Not [ !Equals [ !Ref RecoveryAccount, '' ]]
-  ConfigureBuildRoles: !Equals [ !Ref BuildAccount, !Ref 'AWS::AccountId' ]
-  ConfigureBuildAccount: !Not [ !Equals [ !Ref BuildAccount, '' ]]
-  ConfigureCoreRoles: !Equals [ !Ref CoreAccount, !Ref 'AWS::AccountId' ]
-  ConfigureCoreAccount: !Not [ !Equals [ !Ref CoreAccount, '' ]]
-  ConfigureProductionRoles: !Equals [ !Ref ProductionAccount, !Ref 'AWS::AccountId' ]
-  ConfigureProductionAccount: !Not [ !Equals [ !Ref ProductionAccount, '' ]]
-  ConfigureStagingRoles: !Equals [ !Ref StagingAccount, !Ref 'AWS::AccountId' ]
-  ConfigureStagingAccount: !Not [ !Equals [ !Ref StagingAccount, '' ]]
-  ConfigureUATRoles: !Equals [ !Ref UATAccount, !Ref 'AWS::AccountId' ]
-  ConfigureUATAccount: !Not [ !Equals [ !Ref UATAccount, '' ]]
-  ConfigureQARoles: !Equals [ !Ref QAAccount, !Ref 'AWS::AccountId' ]
-  ConfigureQAAccount: !Not [ !Equals [ !Ref QAAccount, '' ]]
-  ConfigureTestingRoles: !Equals [ !Ref TestingAccount, !Ref 'AWS::AccountId' ]
-  ConfigureTestingAccount: !Not [ !Equals [ !Ref TestingAccount, '' ]]
-  ConfigureDevelopmentRoles: !Equals [ !Ref DevelopmentAccount, !Ref 'AWS::AccountId' ]
-  ConfigureDevelopmentAccount: !Not [ !Equals [ !Ref DevelopmentAccount, '' ]]
+  ConfigureCoreRoles: !Equals [ !Ref CoreAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureCoreAccount: !Not [ !Equals [ !Ref CoreAccountId, '' ]]
+  ConfigureLogRoles: !Equals [ !Ref LogAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureLogAccount: !Not [ !Equals [ !Ref LogAccountId, '' ]]
+  ConfigureBuildRoles: !Equals [ !Ref BuildAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureBuildAccount: !Not [ !Equals [ !Ref BuildAccountId, '' ]]
+  ConfigureProductionRoles: !Equals [ !Ref ProductionAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureProductionAccount: !Not [ !Equals [ !Ref ProductionAccountId, '' ]]
+  ConfigureNonProductionRoles: !Equals [ !Ref NonProductionAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureNonProductionAccount: !Not [ !Equals [ !Ref NonProductionAccountId, '' ]]
+  ConfigureRecoveryRoles: !Equals [ !Ref RecoveryAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureRecoveryAccount: !Not [ !Equals [ !Ref RecoveryAccountId, '' ]]
+  ConfigureStagingRoles: !Equals [ !Ref StagingAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureStagingAccount: !Not [ !Equals [ !Ref StagingAccountId, '' ]]
+  ConfigureUATRoles: !Equals [ !Ref UATAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureUATAccount: !Not [ !Equals [ !Ref UATAccountId, '' ]]
+  ConfigureQARoles: !Equals [ !Ref QAAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureQAAccount: !Not [ !Equals [ !Ref QAAccountId, '' ]]
+  ConfigureTestingRoles: !Equals [ !Ref TestingAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureTestingAccount: !Not [ !Equals [ !Ref TestingAccountId, '' ]]
+  ConfigureDevelopmentRoles: !Equals [ !Ref DevelopmentAccountId, !Ref 'AWS::AccountId' ]
+  ConfigureDevelopmentAccount: !Not [ !Equals [ !Ref DevelopmentAccountId, '' ]]
 Resources:
   OrganizationAccountReferenceRole:
     Type: AWS::IAM::Role
@@ -187,15 +199,55 @@ Resources:
               AWS:
                 - !If
                     - ConfigureJumpstartAccount
-                    - !Sub arn:aws:iam::${JumpstartAccount}:root
+                    - !Sub arn:aws:iam::${JumpstartAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureCoreAccount
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureStagingAccount
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureUATAccount
+                    - !Sub arn:aws:iam::${UATAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureQAAccount
+                    - !Sub arn:aws:iam::${QAAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureTestingAccount
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureDevelopmentAccount
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -217,15 +269,55 @@ Resources:
               AWS:
                 - !If
                     - ConfigureJumpstartAccount
-                    - !Sub arn:aws:iam::${JumpstartAccount}:root
+                    - !Sub arn:aws:iam::${JumpstartAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureCoreAccount
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureStagingAccount
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureUATAccount
+                    - !Sub arn:aws:iam::${UATAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureQAAccount
+                    - !Sub arn:aws:iam::${QAAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureTestingAccount
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureDevelopmentAccount
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -247,7 +339,7 @@ Resources:
               AWS:
                 - !If
                     - ConfigureJumpstartAccount
-                    - !Sub arn:aws:iam::${JumpstartAccount}:root
+                    - !Sub arn:aws:iam::${JumpstartAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -255,7 +347,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
         - !ImportValue
           Fn::Sub: ${MultiAccountManagedPoliciesStackName}-DomainNameServersProxyAccess
-    Condition: ConfigureOrganizationRoles
+    Condition: ConfigureOrganizationDomainNameServersRole
   JumpstartAccountReferenceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -269,11 +361,11 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -295,11 +387,55 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureJumpstartAccount
+                    - !Sub arn:aws:iam::${JumpstartAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureCoreAccount
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureStagingAccount
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureUATAccount
+                    - !Sub arn:aws:iam::${UATAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureQAAccount
+                    - !Sub arn:aws:iam::${QAAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureTestingAccount
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureDevelopmentAccount
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -320,12 +456,56 @@ Resources:
             Principal:
               AWS:
                 - !If
+                    - ConfigureOrganizationAccount
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
                     - ConfigureJumpstartAccount
-                    - !Sub arn:aws:iam::${JumpstartAccount}:root
+                    - !Sub arn:aws:iam::${JumpstartAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureCoreAccount
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureStagingAccount
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureUATAccount
+                    - !Sub arn:aws:iam::${UATAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureQAAccount
+                    - !Sub arn:aws:iam::${QAAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureTestingAccount
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureDevelopmentAccount
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -347,7 +527,7 @@ Resources:
               AWS:
                 - !If
                     - ConfigureJumpstartAccount
-                    - !Sub arn:aws:iam::${JumpstartAccount}:root
+                    - !Sub arn:aws:iam::${JumpstartAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -356,192 +536,6 @@ Resources:
         - !ImportValue
           Fn::Sub: ${MultiAccountManagedPoliciesStackName}-DomainNameServersProxyAccess
     Condition: ConfigureManagementDomainRoles
-  LogAccountReferenceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ReferenceRole
-      Path: /
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS:
-                - !If
-                    - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureStagingAccount
-                    - !Sub arn:aws:iam::${StagingAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureUATAccount
-                    - !Sub arn:aws:iam::${UATAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureQAAccount
-                    - !Sub arn:aws:iam::${QAAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureTestingAccount
-                    - !Sub arn:aws:iam::${TestingAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureDevelopmentAccount
-                    - !Sub arn:aws:iam::${DevelopmentAccount}:root
-                    - !Ref AWS::NoValue
-            Action:
-              - sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - !ImportValue
-          Fn::Sub: ${MultiAccountManagedPoliciesStackName}-ReferenceAccess
-    Condition: ConfigureLogRoles
-  RecoveryAccountReferenceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ReferenceRole
-      Path: /
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS:
-                - !If
-                    - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureStagingAccount
-                    - !Sub arn:aws:iam::${StagingAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureUATAccount
-                    - !Sub arn:aws:iam::${UATAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureQAAccount
-                    - !Sub arn:aws:iam::${QAAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureTestingAccount
-                    - !Sub arn:aws:iam::${TestingAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureDevelopmentAccount
-                    - !Sub arn:aws:iam::${DevelopmentAccount}:root
-                    - !Ref AWS::NoValue
-            Action:
-              - sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - !ImportValue
-          Fn::Sub: ${MultiAccountManagedPoliciesStackName}-ReferenceAccess
-    Condition: ConfigureRecoveryRoles
-  BuildAccountReferenceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ReferenceRole
-      Path: /
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS:
-                - !If
-                    - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureStagingAccount
-                    - !Sub arn:aws:iam::${StagingAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureUATAccount
-                    - !Sub arn:aws:iam::${UATAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureQAAccount
-                    - !Sub arn:aws:iam::${QAAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureTestingAccount
-                    - !Sub arn:aws:iam::${TestingAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureDevelopmentAccount
-                    - !Sub arn:aws:iam::${DevelopmentAccount}:root
-                    - !Ref AWS::NoValue
-            Action:
-              - sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - !ImportValue
-          Fn::Sub: ${MultiAccountManagedPoliciesStackName}-ReferenceAccess
-    Condition: ConfigureBuildRoles
   CoreAccountReferenceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -555,47 +549,51 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
+                    - !Sub arn:aws:iam::${LogAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureStagingAccount
-                    - !Sub arn:aws:iam::${StagingAccount}:root
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureUATAccount
-                    - !Sub arn:aws:iam::${UATAccount}:root
+                    - !Sub arn:aws:iam::${UATAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureQAAccount
-                    - !Sub arn:aws:iam::${QAAccount}:root
+                    - !Sub arn:aws:iam::${QAAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureTestingAccount
-                    - !Sub arn:aws:iam::${TestingAccount}:root
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureDevelopmentAccount
-                    - !Sub arn:aws:iam::${DevelopmentAccount}:root
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -617,47 +615,51 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
+                    - !Sub arn:aws:iam::${LogAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureProductionAccount
-                    - !Sub arn:aws:iam::${ProductionAccount}:root
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureStagingAccount
-                    - !Sub arn:aws:iam::${StagingAccount}:root
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureUATAccount
-                    - !Sub arn:aws:iam::${UATAccount}:root
+                    - !Sub arn:aws:iam::${UATAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureQAAccount
-                    - !Sub arn:aws:iam::${QAAccount}:root
+                    - !Sub arn:aws:iam::${QAAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureTestingAccount
-                    - !Sub arn:aws:iam::${TestingAccount}:root
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureDevelopmentAccount
-                    - !Sub arn:aws:iam::${DevelopmentAccount}:root
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -665,6 +667,138 @@ Resources:
         - !ImportValue
           Fn::Sub: ${MultiAccountManagedPoliciesStackName}-VPCPeeringConnectionAccess
     Condition: ConfigureCoreRoles
+  LogAccountReferenceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ReferenceRole
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !If
+                    - ConfigureOrganizationAccount
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureManagementAccount
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureCoreAccount
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureProductionAccount
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureStagingAccount
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureUATAccount
+                    - !Sub arn:aws:iam::${UATAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureQAAccount
+                    - !Sub arn:aws:iam::${QAAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureTestingAccount
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureDevelopmentAccount
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
+                    - !Ref AWS::NoValue
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !ImportValue
+          Fn::Sub: ${MultiAccountManagedPoliciesStackName}-ReferenceAccess
+    Condition: ConfigureLogRoles
+  BuildAccountReferenceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ReferenceRole
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !If
+                    - ConfigureOrganizationAccount
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureManagementAccount
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureCoreAccount
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureProductionAccount
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureStagingAccount
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureUATAccount
+                    - !Sub arn:aws:iam::${UATAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureQAAccount
+                    - !Sub arn:aws:iam::${QAAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureTestingAccount
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureDevelopmentAccount
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
+                    - !Ref AWS::NoValue
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !ImportValue
+          Fn::Sub: ${MultiAccountManagedPoliciesStackName}-ReferenceAccess
+    Condition: ConfigureBuildRoles
   ProductionAccountReferenceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -678,27 +812,27 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -707,10 +841,10 @@ Resources:
         - !ImportValue
           Fn::Sub: ${MultiAccountManagedPoliciesStackName}-ReferenceAccess
     Condition: ConfigureProductionRoles
-  ProductionAccountHostedZoneDelegationRole:
+  NonProductionAccountReferenceRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: HostedZoneDelegationProxyRole
+      RoleName: ReferenceRole
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -720,55 +854,101 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
-                    - ConfigureStagingAccount
-                    - !Sub arn:aws:iam::${StagingAccount}:root
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
-                    - ConfigureUATAccount
-                    - !Sub arn:aws:iam::${UATAccount}:root
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
-                    - ConfigureQAAccount
-                    - !Sub arn:aws:iam::${QAAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureTestingAccount
-                    - !Sub arn:aws:iam::${TestingAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureDevelopmentAccount
-                    - !Sub arn:aws:iam::${DevelopmentAccount}:root
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
         - !ImportValue
-          Fn::Sub: ${MultiAccountManagedPoliciesStackName}-HostedZoneDelegationProxyAccess
-    Condition: ConfigureProductionRoles
+          Fn::Sub: ${MultiAccountManagedPoliciesStackName}-ReferenceAccess
+    Condition: ConfigureNonProductionRoles
+  RecoveryAccountReferenceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ReferenceRole
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !If
+                    - ConfigureOrganizationAccount
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureManagementAccount
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureCoreAccount
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureProductionAccount
+                    - !Sub arn:aws:iam::${ProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureNonProductionAccount
+                    - !Sub arn:aws:iam::${NonProductionAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureStagingAccount
+                    - !Sub arn:aws:iam::${StagingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureUATAccount
+                    - !Sub arn:aws:iam::${UATAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureQAAccount
+                    - !Sub arn:aws:iam::${QAAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureTestingAccount
+                    - !Sub arn:aws:iam::${TestingAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureDevelopmentAccount
+                    - !Sub arn:aws:iam::${DevelopmentAccountId}:root
+                    - !Ref AWS::NoValue
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !ImportValue
+          Fn::Sub: ${MultiAccountManagedPoliciesStackName}-ReferenceAccess
+    Condition: ConfigureRecoveryRoles
   StagingAccountReferenceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -782,27 +962,27 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -824,27 +1004,27 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -866,27 +1046,27 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -908,27 +1088,27 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -950,27 +1130,27 @@ Resources:
               AWS:
                 - !If
                     - ConfigureOrganizationAccount
-                    - !Sub arn:aws:iam::${OrganizationAccount}:root
+                    - !Sub arn:aws:iam::${OrganizationAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureManagementAccount
-                    - !Sub arn:aws:iam::${ManagementAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureLogAccount
-                    - !Sub arn:aws:iam::${LogAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureRecoveryAccount
-                    - !Sub arn:aws:iam::${RecoveryAccount}:root
-                    - !Ref AWS::NoValue
-                - !If
-                    - ConfigureBuildAccount
-                    - !Sub arn:aws:iam::${BuildAccount}:root
+                    - !Sub arn:aws:iam::${ManagementAccountId}:root
                     - !Ref AWS::NoValue
                 - !If
                     - ConfigureCoreAccount
-                    - !Sub arn:aws:iam::${CoreAccount}:root
+                    - !Sub arn:aws:iam::${CoreAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureLogAccount
+                    - !Sub arn:aws:iam::${LogAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBuildAccount
+                    - !Sub arn:aws:iam::${BuildAccountId}:root
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureRecoveryAccount
+                    - !Sub arn:aws:iam::${RecoveryAccountId}:root
                     - !Ref AWS::NoValue
             Action:
               - sts:AssumeRole
@@ -997,7 +1177,7 @@ Outputs:
     Value: !Ref OrganizationAccountDomainNameServersRole
     Export:
       Name: !Sub ${AWS::StackName}-OrganizationAccountDomainNameServersRole
-    Condition: ConfigureOrganizationRoles
+    Condition: ConfigureOrganizationDomainNameServersRole
   JumpstartAccountReferenceRole:
     Description: The JumpstartAccountReferenceRole Name
     Value: !Ref JumpstartAccountReferenceRole
@@ -1022,24 +1202,6 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}-ManagementAccountDomainNameServersRole
     Condition: ConfigureManagementDomainRoles
-  LogAccountReferenceRole:
-    Description: The LogAccountReferenceRole Name
-    Value: !Ref LogAccountReferenceRole
-    Export:
-      Name: !Sub ${AWS::StackName}-LogAccountReferenceRole
-    Condition: ConfigureLogRoles
-  RecoveryAccountReferenceRole:
-    Description: The RecoveryAccountReferenceRole Name
-    Value: !Ref RecoveryAccountReferenceRole
-    Export:
-      Name: !Sub ${AWS::StackName}-RecoveryAccountReferenceRole
-    Condition: ConfigureRecoveryRoles
-  BuildAccountReferenceRole:
-    Description: The BuildAccountReferenceRole Name
-    Value: !Ref BuildAccountReferenceRole
-    Export:
-      Name: !Sub ${AWS::StackName}-BuildAccountReferenceRole
-    Condition: ConfigureBuildRoles
   CoreAccountReferenceRole:
     Description: The CoreAccountReferenceRole Name
     Value: !Ref CoreAccountReferenceRole
@@ -1052,18 +1214,36 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}-CoreAccountVPCPeeringConnectionRole
     Condition: ConfigureCoreRoles
+  LogAccountReferenceRole:
+    Description: The LogAccountReferenceRole Name
+    Value: !Ref LogAccountReferenceRole
+    Export:
+      Name: !Sub ${AWS::StackName}-LogAccountReferenceRole
+    Condition: ConfigureLogRoles
+  BuildAccountReferenceRole:
+    Description: The BuildAccountReferenceRole Name
+    Value: !Ref BuildAccountReferenceRole
+    Export:
+      Name: !Sub ${AWS::StackName}-BuildAccountReferenceRole
+    Condition: ConfigureBuildRoles
   ProductionAccountReferenceRole:
     Description: The ProductionAccountReferenceRole Name
     Value: !Ref ProductionAccountReferenceRole
     Export:
       Name: !Sub ${AWS::StackName}-ProductionAccountReferenceRole
     Condition: ConfigureProductionRoles
-  ProductionAccountHostedZoneDelegationRole:
-    Description: The ProductionAccountHostedZoneDelegationRole Name
-    Value: !Ref ProductionAccountHostedZoneDelegationRole
+  NonProductionAccountReferenceRole:
+    Description: The NonProductionAccountReferenceRole Name
+    Value: !Ref NonProductionAccountReferenceRole
     Export:
-      Name: !Sub ${AWS::StackName}-ProductionAccountHostedZoneDelegationRole
-    Condition: ConfigureProductionRoles
+      Name: !Sub ${AWS::StackName}-NonProductionAccountReferenceRole
+    Condition: ConfigureNonProductionRoles
+  RecoveryAccountReferenceRole:
+    Description: The RecoveryAccountReferenceRole Name
+    Value: !Ref RecoveryAccountReferenceRole
+    Export:
+      Name: !Sub ${AWS::StackName}-RecoveryAccountReferenceRole
+    Condition: ConfigureRecoveryRoles
   StagingAccountReferenceRole:
     Description: The StagingAccountReferenceRole Name
     Value: !Ref StagingAccountReferenceRole

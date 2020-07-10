@@ -21,7 +21,7 @@ Metadata:
       - Label:
           default: TransitGateway Configuration
         Parameters:
-          - TransitGatewayAccount
+          - TransitGatewayAccountId
           - TransitGatewayASN
           - AutoAcceptSharedAttachments
           - DnsSupport
@@ -30,24 +30,25 @@ Metadata:
           default: ResourceShare Configuration
         Parameters:
           - TransitGatewayResourceShareName
-          - Organization
+          - OrganizationId
           - AllowExternalPrincipals
       - Label:
           default: Account Dependencies
         Parameters:
-          - OrganizationAccount
-          - JumpstartAccount
-          - ManagementAccount
-          - LogAccount
-          - RecoveryAccount
-          - BuildAccount
-          - CoreAccount
-          - ProductionAccount
-          - StagingAccount
-          - UATAccount
-          - QAAccount
-          - TestingAccount
-          - DevelopmentAccount
+          - OrganizationAccountId
+          - JumpstartAccountId
+          - ManagementAccountId
+          - CoreAccountId
+          - LogAccountId
+          - BuildAccountId
+          - ProductionAccountId
+          - NonProductionAccountId
+          - RecoveryAccountId
+          - StagingAccountId
+          - UATAccountId
+          - QAAccountId
+          - TestingAccountId
+          - DevelopmentAccountId
     ParameterLabels:
       ReferenceFunctionsStackName:
         default: ReferenceFunctions Stack Name
@@ -59,8 +60,8 @@ Metadata:
         default: Account Name
       EnvironmentName:
         default: Environment Name
-      TransitGatewayAccount:
-        default: TransitGateway Account
+      TransitGatewayAccountId:
+        default: TransitGateway Account ID
       TransitGatewayASN:
         default: TransitGateway ASN
       AutoAcceptSharedAttachments:
@@ -71,36 +72,38 @@ Metadata:
         default: VPN ECMP Support
       TransitGatewayResourceShareName:
         default: TransitGateway ResourceShare Name
-      Organization:
-        default: Organization
+      OrganizationId:
+        default: Organization ID
       AllowExternalPrincipals:
         default: Allow External Principals
-      OrganizationAccount:
-        default: Organization Account
-      JumpstartAccount:
-        default: Jumpstart Account
-      ManagementAccount:
-        default: Management Account
-      LogAccount:
-        default: Log Account
-      RecoveryAccount:
-        default: Recovery Account
-      BuildAccount:
-        default: Build Account
-      CoreAccount:
-        default: Core Account
-      ProductionAccount:
-        default: Production Account
-      StagingAccount:
-        default: Staging Account
-      UATAccount:
-        default: UAT Account
-      QAAccount:
-        default: QA Account
-      TestingAccount:
-        default: Testing Account
-      DevelopmentAccount:
-        default: Development Account
+      OrganizationAccountId:
+        default: Organization Account ID
+      JumpstartAccountId:
+        default: Jumpstart Account ID
+      ManagementAccountId:
+        default: Management Account ID
+      CoreAccountId:
+        default: Core Account ID
+      LogAccountId:
+        default: Log Account ID
+      BuildAccountId:
+        default: Build Account ID
+      ProductionAccountId:
+        default: Production Account ID
+      NonProductionAccountId:
+        default: NonProduction Account ID
+      RecoveryAccountId:
+        default: Recovery Account ID
+      StagingAccountId:
+        default: Staging Account ID
+      UATAccountId:
+        default: UAT Account ID
+      QAAccountId:
+        default: QA Account ID
+      TestingAccountId:
+        default: Testing Account ID
+      DevelopmentAccountId:
+        default: Development Account ID
 Parameters:
   ReferenceFunctionsStackName:
     Description: Name of the CloudFormation Stack containing the Reference Functions
@@ -131,19 +134,42 @@ Parameters:
     Type: String
     Default: Core
     AllowedValues:
-      - Build
-      - Core
+      - Organization
       - Jumpstart
-    ConstraintDescription: must be Core or Jumpstart.
+      - Management
+      - Core
+      - Log
+      - Build
+      - Production
+      - NonProduction
+      - Recovery
+      - Staging
+      - UAT
+      - QA
+      - Testing
+      - Development
+    ConstraintDescription: must be Organization, Jumpstart, Management, Core, Log, Build, Production, NonProduction, Recovery, Staging, UAT, QA, Testing or Development.
   EnvironmentName:
     Description: Name of the Environment associated with the Stack
     Type: String
     Default: Core
     AllowedValues:
-      - Build
+      - Organization
+      - Jumpstart
+      - Management
       - Core
-    ConstraintDescription: must be Core (may expand later).
-  TransitGatewayAccount:
+      - Log
+      - Build
+      - Production
+      - NonProduction
+      - Recovery
+      - Staging
+      - UAT
+      - QA
+      - Testing
+      - Development
+    ConstraintDescription: must be Organization, Jumpstart, Management, Core, Log, Build, Production, NonProduction, Recovery, Staging, UAT, QA, Testing or Development.
+  TransitGatewayAccountId:
     Description: AWS Account ID of the Account where TransitGateway should be created.
       All other accounts will attempt to share the TransitGateway created in this Account
     Type: String
@@ -186,14 +212,14 @@ Parameters:
     Type: String
     MinLength: 2
     MaxLength: 64
-    Default: Core-TransitGatewayResourceShare
-    AllowedPattern: ^(Organization|Management|Production|Core)-TransitGatewayResourceShare$
+    Default: TransitGatewayResourceShare
+    AllowedPattern: ^TransitGatewayResourceShare$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters.
-  Organization:
+  OrganizationId:
     Description: AWS Organization ID
     Type: String
     Default: ''
-    AllowedPattern: (^$|^o-[0-9][a-z]{10}$)
+    AllowedPattern: (^$|^o-[0-9a-z]{10}$)
     ConstraintDescription: must be a valid AWS Organization ID, or blank.
   AllowExternalPrincipals:
     Description: Allow External Principals (Specifying any Account will force this to true)
@@ -203,128 +229,129 @@ Parameters:
       - true
       - false
     ConstraintDescription: must be either true or false.
-  OrganizationAccount:
+  OrganizationAccountId:
     Description: AWS Account ID of the Organization Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  JumpstartAccount:
+  JumpstartAccountId:
     Description: AWS Account ID of the Jumpstart Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  ManagementAccount:
+  ManagementAccountId:
     Description: AWS Account ID of the Management Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  LogAccount:
-    Description: AWS Account ID of the Log Account
-    Type: String
-    Default: ''
-    AllowedPattern: (^$|^[0-9]{12}$)
-    ConstraintDescription: must be a valid AWS Account ID, or blank.
-  RecoveryAccount:
-    Description: AWS Account ID of the Recovery Account
-    Type: String
-    Default: ''
-    AllowedPattern: (^$|^[0-9]{12}$)
-    ConstraintDescription: must be a valid AWS Account ID, or blank.
-  BuildAccount:
-    Description: AWS Account ID of the Build Account
-    Type: String
-    Default: ''
-    AllowedPattern: (^$|^[0-9]{12}$)
-    ConstraintDescription: must be a valid AWS Account ID, or blank.
-  CoreAccount:
+  CoreAccountId:
     Description: AWS Account ID of the Core Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  ProductionAccount:
+  LogAccountId:
+    Description: AWS Account ID of the Log Account
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^[0-9]{12}$)
+    ConstraintDescription: must be a valid AWS Account ID, or blank.
+  BuildAccountId:
+    Description: AWS Account ID of the Build Account
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^[0-9]{12}$)
+    ConstraintDescription: must be a valid AWS Account ID, or blank.
+  ProductionAccountId:
     Description: AWS Account ID of the Production Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  StagingAccount:
+  NonProductionAccountId:
+    Description: AWS Account ID of the NonProduction Account
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^[0-9]{12}$)
+    ConstraintDescription: must be a valid AWS Account ID, or blank.
+  RecoveryAccountId:
+    Description: AWS Account ID of the Recovery Account
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^[0-9]{12}$)
+    ConstraintDescription: must be a valid AWS Account ID, or blank.
+  StagingAccountId:
     Description: AWS Account ID of the Staging Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  UATAccount:
+  UATAccountId:
     Description: AWS Account ID of the UAT Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  QAAccount:
+  QAAccountId:
     Description: AWS Account ID of the QA Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  TestingAccount:
+  TestingAccountId:
     Description: AWS Account ID of the Testing Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
-  DevelopmentAccount:
+  DevelopmentAccountId:
     Description: AWS Account ID of the Development Account
     Type: String
     Default: ''
     AllowedPattern: (^$|^[0-9]{12}$)
     ConstraintDescription: must be a valid AWS Account ID, or blank.
+Rules:
+  ValidateOrganizationAccountId:
+    RuleCondition: !Not [ !Equals [ !Ref OrganizationId, '' ]]
+    Assertions:
+      - Assert: !Not [ !Equals [ !Ref OrganizationAccountId, '' ]]
+        AssertDescription: OrganizationAccountId required when OrganizationId is specified.
 Conditions:
-  CreateTransitGateway: !Or [ !Equals [ !Ref TransitGatewayAccount, '' ],
-                              !Equals [ !Ref TransitGatewayAccount, 'AWS::AccountId' ]]
+  CreateTransitGateway: !Or [ !Equals [ !Ref TransitGatewayAccountId, '' ],
+                              !Equals [ !Ref TransitGatewayAccountId, 'AWS::AccountId' ]]
   ShareTransitGateway: !Not [ !Condition CreateTransitGateway ]
-  ConfigureOrganization: !Not [ !Equals [ !Ref Organization, '' ]]
-  ConfigureOrganizationAccount: !And [ !Not [ !Equals [ !Ref OrganizationAccount, '' ]],
-                                       !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureJumpstartAccount: !And [ !Not [ !Equals [ !Ref JumpstartAccount, '' ]],
-                                    !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureManagementAccount: !And [ !Not [ !Equals [ !Ref ManagementAccount, '' ]],
-                                     !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureLogAccount: !And [ !Not [ !Equals [ !Ref LogAccount, '' ]],
-                              !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureRecoveryAccount: !And [ !Not [ !Equals [ !Ref RecoveryAccount, '' ]],
-                                   !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureBuildAccount: !And [ !Not [ !Equals [ !Ref BuildAccount, '' ]],
-                                !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureCoreAccount: !And [ !Not [ !Equals [ !Ref CoreAccount, '' ]],
-                               !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureProductionAccount: !And [ !Not [ !Equals [ !Ref ProductionAccount, '' ]],
-                                     !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureStagingAccount: !And [ !Not [ !Equals [ !Ref StagingAccount, '' ]],
-                                  !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureUATAccount: !And [ !Not [ !Equals [ !Ref UATAccount, '' ]],
-                              !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureQAAccount: !And [ !Not [ !Equals [ !Ref QAAccount, '' ]],
-                             !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureTestingAccount: !And [ !Not [ !Equals [ !Ref TestingAccount, '' ]],
-                                  !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureDevelopmentAccount: !And [ !Not [ !Equals [ !Ref DevelopmentAccount, '' ]],
-                                      !Not [ !Equals [ !Ref CoreAccount, 'AWS::AccountId' ]]]
-  ConfigureExternalAccounts: !Or [ !Not [ !Condition ConfigureOrganization ],
-                                   !Or [ !Condition ConfigureOrganizationAccount,
-                                         !Condition ConfigureJumpstartAccount,
-                                         !Condition ConfigureManagementAccount,
-                                         !Condition ConfigureLogAccount,
-                                         !Condition ConfigureRecoveryAccount,
-                                         !Condition ConfigureBuildAccount,
-                                         !Condition ConfigureCoreAccount ],
-                                   !Or [ !Condition ConfigureProductionAccount,
-                                         !Condition ConfigureUATAccount,
-                                         !Condition ConfigureQAAccount,
-                                         !Condition ConfigureTestingAccount,
-                                         !Condition ConfigureDevelopmentAccount ]]
+  ConfigureOrganization: !Not [ !Equals [ !Ref OrganizationId, '' ]]
+  ConfigureOrganizationAccount: !And [ !Not [ !Equals [ !Ref OrganizationAccountId, '' ]],
+                                       !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureJumpstartAccount: !And [ !Not [ !Equals [ !Ref JumpstartAccountId, '' ]],
+                                    !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureManagementAccount: !And [ !Not [ !Equals [ !Ref ManagementAccountId, '' ]],
+                                     !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureCoreAccount: !And [ !Not [ !Equals [ !Ref CoreAccountId, '' ]],
+                               !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureLogAccount: !And [ !Not [ !Equals [ !Ref LogAccountId, '' ]],
+                              !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureBuildAccount: !And [ !Not [ !Equals [ !Ref BuildAccountId, '' ]],
+                                !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureProductionAccount: !And [ !Not [ !Equals [ !Ref ProductionAccountId, '' ]],
+                                     !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureNonProductionAccount: !And [ !Not [ !Equals [ !Ref NonProductionAccountId, '' ]],
+                                        !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureRecoveryAccount: !And [ !Not [ !Equals [ !Ref RecoveryAccountId, '' ]],
+                                   !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureStagingAccount: !And [ !Not [ !Equals [ !Ref StagingAccountId, '' ]],
+                                  !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureUATAccount: !And [ !Not [ !Equals [ !Ref UATAccountId, '' ]],
+                              !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureQAAccount: !And [ !Not [ !Equals [ !Ref QAAccountId, '' ]],
+                             !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureTestingAccount: !And [ !Not [ !Equals [ !Ref TestingAccountId, '' ]],
+                                  !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
+  ConfigureDevelopmentAccount: !And [ !Not [ !Equals [ !Ref DevelopmentAccountId, '' ]],
+                                      !Not [ !Equals [ !Ref CoreAccountId, 'AWS::AccountId' ]]]
 Resources:
   TransitGateway:
     Type: AWS::EC2::TransitGateway
@@ -332,8 +359,8 @@ Resources:
       Description: !Sub ${EnvironmentName}-TransitGateway
       AmazonSideAsn: !Ref TransitGatewayASN
       AutoAcceptSharedAttachments: !Ref AutoAcceptSharedAttachments
-      DefaultRouteTableAssociation: disable
-      DefaultRouteTablePropagation: disable
+      DefaultRouteTableAssociation: enable
+      DefaultRouteTablePropagation: enable
       DnsSupport: !Ref DnsSupport
       VpnEcmpSupport: !Ref VpnEcmpSupport
       Tags:
@@ -344,22 +371,26 @@ Resources:
     Type: AWS::RAM::ResourceShare
     Properties:
       Name: !Ref TransitGatewayResourceShareName
-      AllowExternalPrincipals: !If [ ConfigureExternalAccounts, true, !Ref AllowExternalPrincipals ]
+      AllowExternalPrincipals: !Ref AllowExternalPrincipals
       ResourceArns:
         - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/${TransitGateway}
       Principals:
-        - !If [ ConfigureOrganization, !Ref Organization, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureOrganizationAccount, !Ref OrganizationAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureJumpstartAccount, !Ref JumpstartAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureLogAccount, !Ref LogAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureRecoveryAccount, !Ref RecoveryAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureBuildAccount, !Ref BuildAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureCoreAccount, !Ref CoreAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureProductionAccount, !Ref ProductionAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureStagingAccount, !Ref StagingAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureUATAccount, !Ref UATAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureTestingAccount, !Ref TestingAccount, !Ref 'AWS::NoValue' ]
-        - !If [ ConfigureDevelopmentAccount, !Ref DevelopmentAccount, !Ref 'AWS::NoValue' ]
+        - !If
+            - ConfigureOrganization
+            - !Sub arn:aws:organizations::${OrganizationAccountId}:organization/${OrganizationId}
+            - !If [ ConfigureOrganizationAccount, !Ref OrganizationAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureJumpstartAccount, !Ref JumpstartAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureManagementAccount, !Ref ManagementAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureCoreAccount, !Ref CoreAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureLogAccount, !Ref LogAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureBuildAccount, !Ref BuildAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureProductionAccount, !Ref ProductionAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureNonProductionAccount, !Ref NonProductionAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureRecoveryAccount, !Ref RecoveryAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureStagingAccount, !Ref StagingAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureUATAccount, !Ref UATAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureTestingAccount, !Ref TestingAccountId, !Ref 'AWS::NoValue' ]
+        - !If [ ConfigureDevelopmentAccount, !Ref DevelopmentAccountId, !Ref 'AWS::NoValue' ]
       Tags:
        - Key: Name
          Value: !Sub ${EnvironmentName}-TransitGatewayResourceShare
@@ -370,7 +401,7 @@ Resources:
       ServiceToken: !ImportValue
         Fn::Sub: ${ReferenceFunctionsStackName}-TransitGatewayReferenceFunctionArn
       ResourceShareName: !Ref TransitGatewayResourceShareName
-      SenderAccountId: !Ref TransitGatewayAccount
+      SenderAccountId: !Ref TransitGatewayAccountId
     Condition: ShareTransitGateway
 Outputs:
   TransitGateway:

@@ -31,7 +31,7 @@ Parameters:
     Description: Name of the CloudFormation Stack containing the Public HostedZone
     Type: String
     MaxLength: 64
-    Default: Production-PublicHostedZone
+    Default: PublicHostedZone
     AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
   VerificationTXTValue:

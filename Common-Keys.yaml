@@ -98,43 +98,45 @@ Parameters:
     Type: String
     Default: Production
     AllowedValues:
+      - Organization
+      - Jumpstart
+      - Management
+      - Core
+      - Log
+      - Build
       - Production
+      - NonProduction
+      - Recovery
       - Staging
       - UAT
       - QA
       - Testing
       - Development
-      - Build
-      - Core
-      - Recovery
-      - Log
-      - Management
-      - Jumpstart
-      - Organization
-    ConstraintDescription: must be Production, Staging, UAT, QA, Testing, Development, Build, Core, Recovery, Log, Management, Jumpstart or Organization.
+    ConstraintDescription: must be Organization, Jumpstart, Management, Core, Log, Build, Production, NonProduction, Recovery, Staging, UAT, QA, Testing or Development.
   EnvironmentName:
     Description: Name of the Environment associated with the Stack
     Type: String
     Default: Production
     AllowedValues:
+      - Organization
+      - Jumpstart
+      - Management
+      - Core
+      - Log
+      - Build
       - Production
+      - NonProduction
+      - Recovery
       - Staging
       - UAT
       - QA
       - Testing
       - Development
-      - Build
-      - Core
-      - Recovery
-      - Log
-      - Identity
-      - Management
-      - Organization
-    ConstraintDescription: must be Production, Staging, UAT, QA, Testing, Development, Build, Core, Recovery, Log, Identity, Management or Organization.
+    ConstraintDescription: must be Organization, Jumpstart, Management, Core, Log, Build, Production, NonProduction, Recovery, Staging, UAT, QA, Testing or Development.
   UseSystemCodeInAliasName:
     Description: Include a System Code in the Alias
     Type: String
-    Default: true
+    Default: false
     AllowedValues:
       - true
       - false

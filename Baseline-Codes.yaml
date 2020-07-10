@@ -401,6 +401,12 @@ Resources:
           Name: Management
           Code: m
         - Type: Environment
+          Name: NonProduction
+          Code: n
+        - Type: Environment
+          Name: Organization
+          Code: o
+        - Type: Environment
           Name: Production
           Code: p
         - Type: Environment
@@ -418,6 +424,9 @@ Resources:
         - Type: Environment
           Name: UAT
           Code: u
+        - Type: Environment
+          Name: Experimental
+          Code: x
         - Type: System
           Name: Prototype
           Code: proto
@@ -427,6 +436,9 @@ Resources:
         - Type: System
           Name: DAP
           Code: dap
+        - Type: System
+          Name: MJC
+          Code: mjc
         - Type: Application
           Name: Acunetix
           Code: acu

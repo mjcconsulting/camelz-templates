@@ -15,6 +15,7 @@ Metadata:
           - BootstrapAdministratorPublicKey
           - BootstrapUserPublicKey
           - AdministratorPublicKey
+          - ManagerPublicKey
           - DeveloperPublicKey
           - UserPublicKey
           - ExamplePublicKey
@@ -30,6 +31,8 @@ Metadata:
         default: BootstrapUser PublicKey
       AdministratorPublicKey:
         default: Administrator PublicKey
+      ManagerPublicKey:
+        default: Manager PublicKey
       DeveloperPublicKey:
         default: Developer PublicKey
       UserPublicKey:
@@ -75,6 +78,13 @@ Parameters:
     Default: ''
     AllowedPattern: (^$|^ssh-rsa AAAAB3NzaC1yc2E[=/+A-Za-z0-9]{701}( .*)?$)
     ConstraintDescription: must be a valid Public Key in OpenSSH format, if specified.
+  ManagerPublicKey:
+    Description: Optional public key for the manager KeyPair
+    Type: String
+    NoEcho: true
+    Default: ''
+    AllowedPattern: (^$|^ssh-rsa AAAAB3NzaC1yc2E[=/+A-Za-z0-9]{701}( .*)?$)
+    ConstraintDescription: must be a valid Public Key in OpenSSH format, if specified.
   DeveloperPublicKey:
     Description: Optional public key for the developer KeyPair
     Type: String
@@ -108,6 +118,7 @@ Conditions:
   ConfigureBootstrapAdministratorKeyPair: !Not [ !Equals [ !Ref BootstrapAdministratorPublicKey, '' ]]
   ConfigureBootstrapUserKeyPair: !Not [ !Equals [ !Ref BootstrapUserPublicKey, '' ]]
   ConfigureAdministratorKeyPair: !Not [ !Equals [ !Ref AdministratorPublicKey, '' ]]
+  ConfigureManagerKeyPair: !Not [ !Equals [ !Ref ManagerPublicKey, '' ]]
   ConfigureDeveloperKeyPair: !Not [ !Equals [ !Ref DeveloperPublicKey, '' ]]
   ConfigureUserKeyPair: !Not [ !Equals [ !Ref UserPublicKey, '' ]]
   ConfigureExampleKeyPair: !Not [ !Equals [ !Ref ExamplePublicKey, '' ]]
@@ -145,6 +156,14 @@ Resources:
       KeyName: administrator
       PublicKey: !Ref AdministratorPublicKey
     Condition: ConfigureAdministratorKeyPair
+  ManagerKeyPair:
+    Type: Custom::KeyPair
+    Properties:
+      ServiceToken: !ImportValue
+        Fn::Sub: ${BaselineStackName}-KeyPairFunctionArn
+      KeyName: manager
+      PublicKey: !Ref ManagerPublicKey
+    Condition: ConfigureManagerKeyPair
   DeveloperKeyPair:
     Type: Custom::KeyPair
     Properties:
@@ -218,6 +237,16 @@ Outputs:
     Description: The Administrator KeyPair Fingerprint
     Value: !GetAtt AdministratorKeyPair.Fingerprint
     Condition: ConfigureAdministratorKeyPair
+  ManagerKeyPair:
+    Description: The Manager KeyPair
+    Value: !Ref ManagerKeyPair
+    Export:
+      Name: !Sub ${AWS::StackName}-ManagerKeyPair
+    Condition: ConfigureManagerKeyPair
+  ManagerKeyPairFingerprint:
+    Description: The Manager KeyPair Fingerprint
+    Value: !GetAtt ManagerKeyPair.Fingerprint
+    Condition: ConfigureManagerKeyPair
   DeveloperKeyPair:
     Description: The Developer KeyPair
     Value: !Ref DeveloperKeyPair

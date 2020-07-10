@@ -11,10 +11,13 @@ Metadata:
       - Label:
           default: RecordSet Configuration
         Parameters:
+          - SPFTXTValue
           - CheckTXTValue
     ParameterLabels:
       PublicHostedZoneStackName:
         default: PublicHostedZone Stack Name
+      SPFTXTValue:
+        default: SPF TXT Value
       CheckTXTValue:
         default: Check TXT Value
 Parameters:
@@ -22,9 +25,15 @@ Parameters:
     Description: Name of the CloudFormation Stack containing the Public HostedZone
     Type: String
     MaxLength: 64
-    Default: Production-PublicHostedZone
+    Default: PublicHostedZone
     AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  SPFTXTValue:
+    Description: Optional value of SPF TXT Record (without quotes)
+    Type: String
+    Default: ''
+    AllowedPattern: (^$|^v=spf1.*$)
+    ConstraintDescription: must be a a valid SPF v1 string, if specified.
   CheckTXTValue:
     Description: Optional value of Check TXT Record (without quotes)
     Type: String
@@ -32,8 +41,23 @@ Parameters:
     AllowedPattern: (^$|^[A-Za-z0-9]{32}$)
     ConstraintDescription: must be a string of 32 alphanumeric characters, if specified.
 Conditions:
+  ConfigureSPFTXTRecordSet: !Not [ !Equals [ !Ref SPFTXTValue, '' ]]
   ConfigureCheckTXTRecordSet: !Not [ !Equals [ !Ref CheckTXTValue, '' ]]
 Resources:
+  PublicSPFTXTRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !ImportValue
+        Fn::Sub: ${PublicHostedZoneStackName}-PublicHostedZone
+      Name: !Sub
+        - ${PublicDomain}.
+        - PublicDomain: !ImportValue
+            Fn::Sub: ${PublicHostedZoneStackName}-PublicDomain
+      Type: TXT
+      TTL: 1800
+      ResourceRecords:
+        - !Sub '"${SPFTXTValue}"'
+    Condition: ConfigureSPFTXTRecordSet
   PublicCheckTXTRecordSet:
     Type: AWS::Route53::RecordSet
     Properties:
