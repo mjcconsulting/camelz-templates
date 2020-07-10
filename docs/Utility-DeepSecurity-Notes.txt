@@ -1,0 +1,105 @@
+dsm1
+- default
+  - setup = ConfigureCFN
+    - files:
+      - /etc/cfn/cfn-hup.conf
+      - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+    - services:
+      - sysvinit, cfn-hup
+
+  - prepDSMInstall
+    - files:
+      - /etc/cfn/dsmConfiguration.properties (variables, some logic)
+
+  - installDSM
+    - commands:
+      - 0-sethostnameinprops - append local-ip4 from metadata to dsmConfiguration.properties
+      - 1-install-DSM - run installer using properties file
+      - 6-install-xml_grep - yum -y install perl-XML-Twig
+
+  - addCloudAccount
+    - files:
+      - /etc/cfn/set-aia-settings.sh - download script
+      - /etc/cfn/kill-mp-web-installer.sh - download script
+      - /etc/cfn/add-aws-account-with-instance-role.sh - download script
+    - commands:
+      - 5-check-service - until curl -vk https://127.0.0.1:${DSIPGUIPort}/rest/status/manager/current/ping; do echo "manager not started yet" >> /tmp/4-check-service; service dsm_s start >> /tmp/4-check-service;sleep 30; done
+      - 7-set-aia-settings - /etc/cfn/set-aia-settings.sh ${DSCAdminName} ${DSCAdminPassword} - ${DSIPGUIPort} >> /tmp/set-aia-settings.log
+      - 8-addCloudAccount - /etc/cfn/add-aws-account-with-instance-role.sh ${DSCAdminName} ${DSCAdminPassword} localhost ${DSIPGUIPort} ${AWS::Region}
+      - 10-killWebInstaller - /etc/cfn/kill-mp-web-installer.sh
+
+  - fixManagerHostObject
+    - files:
+      - /etc/cfn/reactivate-manager.sh - download script
+    - commands: 
+      - 1-reactivate-manager.sh - /etc/cfn/reactivate-manager.sh >> /etc/cfn/reactivate-manager.log ${DSCAdminName} ${DSCAdminPassword} ${DSIPGUIPort}
+
+- setupLocalELB
+  - addToELB
+    - commands:
+      - 0-add-instance-to-elb - aws elb register-instances-with-load-balancer --load-balancer ${DSIELB} --instances $(curl http://169.254.169.254/latest/meta-data/instance-id/) --region ${AWS::Region}
+
+  - fixManagerLocalLoadBalancerHostsFile
+    - commands:
+      - 1-setHostsFileELB - echo "$(curl http://169.254.169.254/latest/meta-data/local-ipv4/) ${DSIELBFQDN}" >> /etc/hosts
+
+- setupGlobalELB
+  - fixManagerLoadBalancerSettings
+    - files:
+      - /etc/cfn/create-console-listener.sh - download script
+      - /etc/cfn/set-lb-settings.sh - download script
+    - commands:
+      - 1-setup-elb-listener - /etc/cfn/create-console-listener.sh ${DSIELB} ${DSIELBFQDN} ${DSIPGUIPort} ${AWS::StackName} 1 ${AWS::Region} >> /tmp/listener.log
+      - 4-set-load-balancer-settings - /etc/cfn/set-lb-settings.sh ${DSCAdminName} ${DSCAdminPassword} ${DSIELBFQDN} ${DSIPGUIPort} ${DSIPHeartbeatPort} >> /tmp/set-lb-settings.log
+
+
+dsm2
+- fixManagerLocalLbAddress
+  - fixManagerLocalLoadBalancerHostsFile
+    - commands:
+      - 1-setHostsFileELB - echo "$(curl http://169.254.169.254/latest/meta-data/local-ipv4/) ${DSIELBFQDN}" >> /etc/hosts
+
+- addDsmNode
+  - setup = ConfigureCFN
+    - files:
+      - /etc/cfn/cfn-hup.conf
+      - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+    - services:
+      - sysvinit, cfn-hup
+
+  - prepDSMInstall
+    - files:
+      - /etc/cfn/dsmConfiguration.properties (variables, some logic)
+
+  - installDSM
+    - commands:
+      - 0-sethostnameinprops - append local-ip4 from metadata to dsmConfiguration.properties
+      - 1-install-DSM - run installer using properties file
+      - 6-install-xml_grep - yum -y install perl-XML-Twig
+
+  - fixManagerHostObject
+    - files:
+      - /etc/cfn/reactivate-manager.sh - download script
+    - commands:
+      - 1-reactivate-manager.sh - /etc/cfn/reactivate-manager.sh >> /etc/cfn/reactivate-manager.log ${DSCAdminName} ${DSCAdminPassword} ${DSIPGUIPort}
+
+- setupLocalELB
+  - addToELB
+    - commands:
+      - 0-add-instance-to-elb - aws elb register-instances-with-load-balancer --load-balancer ${DSIELB} --instances $(curl http://169.254.169.254/latest/meta-data/instance-id/) --region ${AWS::Region}
+
+  - fixManagerLocalLoadBalancerHostsFile
+    - commands:
+      - 1-setHostsFileELB - echo "$(curl http://169.254.169.254/latest/meta-data/local-ipv4/) ${DSIELBFQDN}" >> /etc/hosts
+
+
+ConfigSets Not used in QuickStart
+- oSqlSetup (used only for SQL Server)
+  - sqlSetup
+
+- fixManagerLbSettings (configset unused, but the step it runs is used elsewhere
+  - fixManagerLoadBalancerSettings
+
+- fixManagerHostObject (configset unused, but the step it runs is used elsewhere
+  - fixManagerHostObject
+
