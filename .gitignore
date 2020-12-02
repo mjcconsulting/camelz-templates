@@ -3,9 +3,11 @@ old/
 new/
 tmp/
 save/
+hold/
 
 # Artifacts
 bucket/
+bucket-examples/
 
 # Log files
 logs
