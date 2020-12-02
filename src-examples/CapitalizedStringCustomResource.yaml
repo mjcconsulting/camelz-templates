@@ -27,7 +27,7 @@ Resources:
     Properties:
       Description: A Lambda function which capitalizes a string.
       Role: !GetAtt CapitalizedStringRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Handler: index.handler
       Code:

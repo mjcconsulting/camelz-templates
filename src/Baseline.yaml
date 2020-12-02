@@ -199,7 +199,7 @@ Resources:
       FunctionName: EncodedLayerVersion
       Description: A Lambda function which creates a Lambda LayerVersion from Base64-encoded Content.
       Role: !GetAtt EncodedLayerVersionRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Handler: index.handler
       Code:
@@ -306,6 +306,7 @@ Resources:
       CompatibleRuntimes:
         - nodejs8.10
         - nodejs10.x
+        - nodejs12.x
       Content: !Ref BaselineLayerEncodedContent
   RandomPasswordRole:
     Type: AWS::IAM::Role
@@ -342,7 +343,7 @@ Resources:
       FunctionName: RandomPassword
       Description: A Lambda function that generates a random password using the SecretsManager getRandomPassword method.
       Role: !GetAtt RandomPasswordRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Handler: index.handler
       Code:
@@ -479,7 +480,7 @@ Resources:
       FunctionName: SecureParameter
       Description: A Lambda function that handles an SSM SecureString Parameter as a CustomResource, as this parameter Type is not currently supported.
       Role: !GetAtt SecureParameterRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Handler: index.handler
       Code:
@@ -598,7 +599,7 @@ Resources:
       FunctionName: Message
       Description: A Lambda function that publishes a message to an SNS Topic.
       Role: !GetAtt MessageRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Handler: index.handler
       Code:
@@ -693,7 +694,7 @@ Resources:
       FunctionName: PrivateIpAddress
       Description: A Lambda function which calculates a PrivateIpAddress as an Offset into a VPC Subnet, based on the Subnet CIDR obtained via a Subnet ID.
       Role: !GetAtt PrivateIpAddressRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !Ref BaselineLayerVersion
@@ -821,7 +822,7 @@ Resources:
       FunctionName: KeyPair
       Description: A Lambda function that uses an external SSH Public Key to import an EC2 KeyPair.
       Role: !GetAtt KeyPairRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !Ref BaselineLayerVersion

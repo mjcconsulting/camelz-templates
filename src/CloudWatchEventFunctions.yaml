@@ -14,8 +14,7 @@ Metadata:
       - Label:
           default: Function Configuration
         Parameters:
-          - PrivateRecordSetFunctionKey
-          - PrivateRecordSetFunctionObjectVersion
+          - PrivateRecordSetFunctionS3Key
           - PrivateRecordSetLogRetention
           - PrivateRecordSetPrune
           - PrivateRecordSetTest
@@ -26,10 +25,8 @@ Metadata:
         default: Buckets Stack Name
       TopicsStackName:
         default: Topics Stack Name
-      PrivateRecordSetFunctionKey:
+      PrivateRecordSetFunctionS3Key:
         default: PrivateRecordSet Function S3 Key
-      PrivateRecordSetFunctionObjectVersion:
-        default: PrivateRecordSet Function S3 Object Version
       PrivateRecordSetLogRetention:
         default: PrivateRecordSet Log Retention
       PrivateRecordSetPrune:
@@ -61,20 +58,14 @@ Parameters:
     Default: Topics
     AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
-  PrivateRecordSetFunctionKey:
+  PrivateRecordSetFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the PrivateRecordSet Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: PrivateRecordSet.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  PrivateRecordSetFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the PrivateRecordSet Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^PrivateRecordSet(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be PrivateRecordSet.zip, or PrivateRecordSet/<md5_hash>.zip.
   PrivateRecordSetLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the PrivateRecordSet Lambda Function
     Type: Number
@@ -105,8 +96,6 @@ Parameters:
       - true
       - false
     ConstraintDescription: must be either true or false.
-Conditions:
-  ConfigurePrivateRecordSetFunctionObjectVersion: !Not [ !Equals [ !Ref PrivateRecordSetFunctionObjectVersion, '' ]]
 Resources:
   PrivateRecordSetRole:
     Type: AWS::IAM::Role
@@ -160,14 +149,13 @@ Resources:
       FunctionName: PrivateRecordSet
       Description: A Lambda function that manages Domain Name RecordSets in a Route53 Private HostedZone.
       Role: !GetAtt PrivateRecordSetRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 120 # Confirmation can take 30 to 60 seconds
       Handler: PrivateRecordSet.handler
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref PrivateRecordSetFunctionKey
-        S3ObjectVersion: !If [ ConfigurePrivateRecordSetFunctionObjectVersion, !Ref PrivateRecordSetFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref PrivateRecordSetFunctionS3Key
       Environment:
         Variables:
           PRUNE: !Ref PrivateRecordSetPrune

@@ -172,7 +172,7 @@ Resources:
       FunctionName: CodesLoader
       Description: A Lambda function which loads data into the DynamoDB Codes Table, used to construct Identifiers used by the Camelz Framework.
       Role: !GetAtt CodesLoaderRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -773,7 +773,7 @@ Resources:
       FunctionName: AliasName
       Description: A Lambda function which creates an AliasName that conforms to Camelz Framework Naming Conventions.
       Role: !GetAtt IdentifierRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -857,7 +857,7 @@ Resources:
       FunctionName: LogGroupName
       Description: A Lambda function which creates a LogGroupName that conforms to Camelz Framework Naming Conventions.
       Role: !GetAtt IdentifierRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -941,7 +941,7 @@ Resources:
       FunctionName: HostName
       Description: A Lambda function which creates a HostName that conforms to Camelz Framework Naming Conventions.
       Role: !GetAtt IdentifierRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -1043,7 +1043,7 @@ Resources:
       FunctionName: DomainName
       Description: A Lambda function which creates a DomainName that conforms to Camelz Framework Naming Conventions.
       Role: !GetAtt IdentifierRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue

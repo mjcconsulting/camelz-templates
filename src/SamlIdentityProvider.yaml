@@ -159,7 +159,7 @@ Resources:
       FunctionName: MetadataDownloader
       Description: A Lambda function that can download Metadata from an URL.
       Role: !GetAtt MetadataDownloaderRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Handler: index.handler
       Code:
@@ -252,7 +252,7 @@ Resources:
       FunctionName: SamlProvider
       Description: A Lambda function that can create, update or delete an IAM SAML Identity Provider.
       Role: !GetAtt SamlProviderRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Handler: index.handler
       Code:

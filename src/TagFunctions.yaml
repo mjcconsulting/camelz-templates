@@ -13,8 +13,7 @@ Metadata:
       - Label:
           default: Function Configuration
         Parameters:
-          - VpcDefaultResourceTaggerFunctionKey
-          - VpcDefaultResourceTaggerFunctionObjectVersion
+          - VpcDefaultResourceTaggerFunctionS3Key
           - VpcDefaultResourceTaggerLogRetention
     ParameterLabels:
       LayersStackName:
@@ -23,10 +22,8 @@ Metadata:
         default: Buckets Stack Name
       TopicsStackName:
         default: Topics Stack Name
-      VpcDefaultResourceTaggerFunctionKey:
+      VpcDefaultResourceTaggerFunctionS3Key:
         default: VpcDefaultResourceTagger Function S3 Key
-      VpcDefaultResourceTaggerFunctionObjectVersion:
-        default: VpcDefaultResourceTagger Function S3 Object Version
       VpcDefaultResourceTaggerLogRetention:
         default: VpcDefaultResourceTagger Log Retention
 Parameters:
@@ -54,20 +51,14 @@ Parameters:
     Default: Topics
     AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
-  VpcDefaultResourceTaggerFunctionKey:
+  VpcDefaultResourceTaggerFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the VpcDefaultResourceTagger Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: VpcDefaultResourceTagger.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  VpcDefaultResourceTaggerFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the VpcDefaultResourceTagger Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^VpcDefaultResourceTagger(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be VpcDefaultResourceTagger.zip, or VpcDefaultResourceTagger/<md5_hash>.zip.
   VpcDefaultResourceTaggerLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the VpcDefaultResourceTagger Lambda Function
     Type: Number
@@ -82,8 +73,6 @@ Parameters:
       - 60
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
-Conditions:
-  ConfigureVpcDefaultResourceTaggerFunctionObjectVersion: !Not [ !Equals [ !Ref VpcDefaultResourceTaggerFunctionObjectVersion, '' ]]
 Resources:
   VpcDefaultResourceTaggerRole:
     Type: AWS::IAM::Role
@@ -124,7 +113,7 @@ Resources:
       FunctionName: VpcDefaultResourceTagger
       Description: A Lambda function that tags the default resources created along with a VPC, which are otherwise untagged.
       Role: !GetAtt VpcDefaultResourceTaggerRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -133,8 +122,7 @@ Resources:
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref VpcDefaultResourceTaggerFunctionKey
-        S3ObjectVersion: !If [ ConfigureVpcDefaultResourceTaggerFunctionObjectVersion, !Ref VpcDefaultResourceTaggerFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref VpcDefaultResourceTaggerFunctionS3Key
     DependsOn: VpcDefaultResourceTaggerLogGroup
 Outputs:
   VpcDefaultResourceTaggerFunctionArn:

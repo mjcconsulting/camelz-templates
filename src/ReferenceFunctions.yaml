@@ -15,26 +15,19 @@ Metadata:
       - Label:
           default: Function Configuration
         Parameters:
-          - RoleReferenceFunctionKey
-          - RoleReferenceFunctionObjectVersion
+          - RoleReferenceFunctionS3Key
           - RoleReferenceLogRetention
-          - VpcReferenceFunctionKey
-          - VpcReferenceFunctionObjectVersion
+          - VpcReferenceFunctionS3Key
           - VpcReferenceLogRetention
-          - SubnetReferenceFunctionKey
-          - SubnetReferenceFunctionObjectVersion
+          - SubnetReferenceFunctionS3Key
           - SubnetReferenceLogRetention
-          - SecurityGroupReferenceFunctionKey
-          - SecurityGroupReferenceFunctionObjectVersion
+          - SecurityGroupReferenceFunctionS3Key
           - SecurityGroupReferenceLogRetention
-          - StackExportReferenceFunctionKey
-          - StackExportReferenceFunctionObjectVersion
+          - StackExportReferenceFunctionS3Key
           - StackExportReferenceLogRetention
-          - StackExportsReferenceFunctionKey
-          - StackExportsReferenceFunctionObjectVersion
+          - StackExportsReferenceFunctionS3Key
           - StackExportsReferenceLogRetention
-          - TransitGatewayReferenceFunctionKey
-          - TransitGatewayReferenceFunctionObjectVersion
+          - TransitGatewayReferenceFunctionS3Key
           - TransitGatewayReferenceLogRetention
     ParameterLabels:
       LayersStackName:
@@ -43,46 +36,32 @@ Metadata:
         default: Buckets Stack Name
       TopicsStackName:
         default: Topics Stack Name
-      RoleReferenceFunctionKey:
+      RoleReferenceFunctionS3Key:
         default: RoleReference Function S3 Key
-      RoleReferenceFunctionObjectVersion:
-        default: RoleReference Function S3 Object Version
       RoleReferenceLogRetention:
         default: RoleReference Log Retention
-      VpcReferenceFunctionKey:
+      VpcReferenceFunctionS3Key:
         default: VpcReference Function S3 Key
-      VpcReferenceFunctionObjectVersion:
-        default: VpcReference Function S3 Object Version
       VpcReferenceLogRetention:
         default: VpcReference Log Retention
-      SubnetReferenceFunctionKey:
+      SubnetReferenceFunctionS3Key:
         default: SubnetReference Function S3 Key
-      SubnetReferenceFunctionObjectVersion:
-        default: SubnetReference Function S3 Object Version
       SubnetReferenceLogRetention:
         default: SubnetReference Log Retention
-      SecurityGroupReferenceFunctionKey:
+      SecurityGroupReferenceFunctionS3Key:
         default: SecurityGroupReference Function S3 Key
-      SecurityGroupReferenceFunctionObjectVersion:
-        default: SecurityGroupReference Function S3 Object Version
       SecurityGroupReferenceLogRetention:
         default: SecurityGroupReference Log Retention
-      StackExportReferenceFunctionKey:
+      StackExportReferenceFunctionS3Key:
         default: StackExportReference Function S3 Key
-      StackExportReferenceFunctionObjectVersion:
-        default: StackExportReference Function S3 Object Version
       StackExportReferenceLogRetention:
         default: StackExportReference Log Retention
-      StackExportsReferenceFunctionKey:
+      StackExportsReferenceFunctionS3Key:
         default: StackExportsReference Function S3 Key
-      StackExportsReferenceFunctionObjectVersion:
-        default: StackExportsReference Function S3 Object Version
       StackExportsReferenceLogRetention:
         default: StackExportsReference Log Retention
-      TransitGatewayReferenceFunctionKey:
+      TransitGatewayReferenceFunctionS3Key:
         default: TransitGatewayReference Function S3 Key
-      TransitGatewayReferenceFunctionObjectVersion:
-        default: TransitGatewayReference Function S3 Object Version
       TransitGatewayReferenceLogRetention:
         default: TransitGatewayReference Log Retention
 Parameters:
@@ -110,20 +89,14 @@ Parameters:
     Default: Topics
     AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
-  RoleReferenceFunctionKey:
+  RoleReferenceFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the RoleReference Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: RoleReference.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  RoleReferenceFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the RoleReference Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^RoleReference(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be RoleReference.zip, or RoleReference/<md5_hash>.zip.
   RoleReferenceLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the RoleReference Lambda Function
     Type: Number
@@ -138,20 +111,14 @@ Parameters:
       - 60
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
-  VpcReferenceFunctionKey:
+  VpcReferenceFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the VpcReference Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: VpcReference.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  VpcReferenceFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the VpcReference Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^VpcReference(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be VpcReference.zip, or VpcReference/<md5_hash>.zip.
   VpcReferenceLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the VpcReference Lambda Function
     Type: Number
@@ -166,20 +133,14 @@ Parameters:
       - 60
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
-  SubnetReferenceFunctionKey:
+  SubnetReferenceFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the SubnetReference Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: SubnetReference.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  SubnetReferenceFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the SubnetReference Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^SubnetReference(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be SubnetReference.zip, or SubnetReference/<md5_hash>.zip.
   SubnetReferenceLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the SubnetReference Lambda Function
     Type: Number
@@ -194,20 +155,14 @@ Parameters:
       - 60
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
-  SecurityGroupReferenceFunctionKey:
+  SecurityGroupReferenceFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the SecurityGroupReference Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: SecurityGroupReference.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  SecurityGroupReferenceFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the SecurityGroupReference Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^SecurityGroupReference(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be SecurityGroupReference.zip, or SecurityGroupReference/<md5_hash>.zip.
   SecurityGroupReferenceLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the SecurityGroupReference Lambda Function
     Type: Number
@@ -222,20 +177,14 @@ Parameters:
       - 60
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
-  StackExportReferenceFunctionKey:
+  StackExportReferenceFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the StackExportReference Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: StackExportReference.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  StackExportReferenceFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the StackExportReference Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^StackExportReference(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be StackExportReference.zip, or StackExportReference/<md5_hash>.zip.
   StackExportReferenceLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the StackExportReference Lambda Function
     Type: Number
@@ -250,20 +199,14 @@ Parameters:
       - 60
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
-  StackExportsReferenceFunctionKey:
+  StackExportsReferenceFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the StackExportsReference Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: StackExportsReference.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  StackExportsReferenceFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the StackExportsReference Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^StackExportsReference(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be StackExportsReference.zip, or StackExportsReference/<md5_hash>.zip.
   StackExportsReferenceLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the StackExportsReference Lambda Function
     Type: Number
@@ -278,20 +221,14 @@ Parameters:
       - 60
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
-  TransitGatewayReferenceFunctionKey:
+  TransitGatewayReferenceFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the TransitGatewayReference Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: TransitGatewayReference.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  TransitGatewayReferenceFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the TransitGatewayReference Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^TransitGatewayReference(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be TransitGatewayReference.zip, or TransitGatewayReference/<md5_hash>.zip.
   TransitGatewayReferenceLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the TransitGatewayReference Lambda Function
     Type: Number
@@ -306,14 +243,6 @@ Parameters:
       - 60
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
-Conditions:
-  ConfigureRoleReferenceFunctionObjectVersion: !Not [ !Equals [ !Ref RoleReferenceFunctionObjectVersion, '' ]]
-  ConfigureVpcReferenceFunctionObjectVersion: !Not [ !Equals [ !Ref VpcReferenceFunctionObjectVersion, '' ]]
-  ConfigureSubnetReferenceFunctionObjectVersion: !Not [ !Equals [ !Ref SubnetReferenceFunctionObjectVersion, '' ]]
-  ConfigureSecurityGroupReferenceFunctionObjectVersion: !Not [ !Equals [ !Ref SecurityGroupReferenceFunctionObjectVersion, '' ]]
-  ConfigureStackExportReferenceFunctionObjectVersion: !Not [ !Equals [ !Ref StackExportReferenceFunctionObjectVersion, '' ]]
-  ConfigureStackExportsReferenceFunctionObjectVersion: !Not [ !Equals [ !Ref StackExportsReferenceFunctionObjectVersion, '' ]]
-  ConfigureTransitGatewayReferenceFunctionObjectVersion: !Not [ !Equals [ !Ref TransitGatewayReferenceFunctionObjectVersion, '' ]]
 Resources:
   ReferenceRole:
     Type: AWS::IAM::Role
@@ -392,7 +321,7 @@ Resources:
       FunctionName: RoleReference
       Description: A Lambda function that returns information about an IAM Role in another Region and/or Account.
       Role: !GetAtt ReferenceRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -401,8 +330,7 @@ Resources:
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref RoleReferenceFunctionKey
-        S3ObjectVersion: !If [ ConfigureRoleReferenceFunctionObjectVersion, !Ref RoleReferenceFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref RoleReferenceFunctionS3Key
     DependsOn: RoleReferenceLogGroup
   VpcReferenceLogGroup:
     Type: AWS::Logs::LogGroup
@@ -415,7 +343,7 @@ Resources:
       FunctionName: VpcReference
       Description: A Lambda function that returns information about an EC2 VPC in another Region and/or Account.
       Role: !GetAtt ReferenceRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -424,8 +352,7 @@ Resources:
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref VpcReferenceFunctionKey
-        S3ObjectVersion: !If [ ConfigureVpcReferenceFunctionObjectVersion, !Ref VpcReferenceFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref VpcReferenceFunctionS3Key
     DependsOn: VpcReferenceLogGroup
   SubnetReferenceLogGroup:
     Type: AWS::Logs::LogGroup
@@ -438,7 +365,7 @@ Resources:
       FunctionName: SubnetReference
       Description: A Lambda function that returns information about an EC2 Subnet in another Region and/or Account.
       Role: !GetAtt ReferenceRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -447,8 +374,7 @@ Resources:
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref SubnetReferenceFunctionKey
-        S3ObjectVersion: !If [ ConfigureSubnetReferenceFunctionObjectVersion, !Ref SubnetReferenceFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref SubnetReferenceFunctionS3Key
     DependsOn: SubnetReferenceLogGroup
   SecurityGroupReferenceLogGroup:
     Type: AWS::Logs::LogGroup
@@ -461,7 +387,7 @@ Resources:
       FunctionName: SecurityGroupReference
       Description: A Lambda function that returns information about an EC2 Security Group in another Region and/or Account.
       Role: !GetAtt ReferenceRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -470,8 +396,7 @@ Resources:
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref SecurityGroupReferenceFunctionKey
-        S3ObjectVersion: !If [ ConfigureSecurityGroupReferenceFunctionObjectVersion, !Ref SecurityGroupReferenceFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref SecurityGroupReferenceFunctionS3Key
     DependsOn: SecurityGroupReferenceLogGroup
   StackExportReferenceLogGroup:
     Type: AWS::Logs::LogGroup
@@ -484,7 +409,7 @@ Resources:
       FunctionName: StackExportReference
       Description: A Lambda function that returns the value of a single Stack Export in another Region and/or Account.
       Role: !GetAtt ReferenceRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -493,8 +418,7 @@ Resources:
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref StackExportReferenceFunctionKey
-        S3ObjectVersion: !If [ ConfigureStackExportReferenceFunctionObjectVersion, !Ref StackExportReferenceFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref StackExportReferenceFunctionS3Key
     DependsOn: StackExportReferenceLogGroup
   StackExportsReferenceLogGroup:
     Type: AWS::Logs::LogGroup
@@ -507,7 +431,7 @@ Resources:
       FunctionName: StackExportsReference
       Description: A Lambda function that returns the values of all Exports for a single CloudFormation Stack in another Region and/or Account.
       Role: !GetAtt ReferenceRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -516,8 +440,7 @@ Resources:
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref StackExportsReferenceFunctionKey
-        S3ObjectVersion: !If [ ConfigureStackExportsReferenceFunctionObjectVersion, !Ref StackExportsReferenceFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref StackExportsReferenceFunctionS3Key
     DependsOn: StackExportsReferenceLogGroup
   TransitGatewayReferenceRole:
     Type: AWS::IAM::Role
@@ -558,7 +481,7 @@ Resources:
       FunctionName: TransitGatewayReference
       Description: A Lambda function that creates an alias for a directory service.
       Role: !GetAtt TransitGatewayReferenceRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Layers:
         - !ImportValue
@@ -567,10 +490,8 @@ Resources:
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref TransitGatewayReferenceFunctionKey
-        S3ObjectVersion: !If [ ConfigureTransitGatewayReferenceFunctionObjectVersion, !Ref TransitGatewayReferenceFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref TransitGatewayReferenceFunctionS3Key
     DependsOn: TransitGatewayReferenceLogGroup
-
 Outputs:
   RoleReferenceFunctionArn:
     Description: The RoleReference Lambda Function ARN

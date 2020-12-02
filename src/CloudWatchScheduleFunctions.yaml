@@ -14,8 +14,7 @@ Metadata:
       - Label:
           default: Function Configuration
         Parameters:
-          - SchedulerFunctionKey
-          - SchedulerFunctionObjectVersion
+          - SchedulerFunctionS3Key
           - SchedulerLogRetention
           - SchedulerTag
           - SchedulerTest
@@ -26,10 +25,8 @@ Metadata:
         default: Buckets Stack Name
       TopicsStackName:
         default: Topics Stack Name
-      SchedulerFunctionKey:
+      SchedulerFunctionS3Key:
         default: Scheduler Function S3 Key
-      SchedulerFunctionObjectVersion:
-        default: Scheduler Function S3 Object Version
       SchedulerLogRetention:
         default: Scheduler Log Retention
       SchedulerTag:
@@ -61,20 +58,14 @@ Parameters:
     Default: Topics
     AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
-  SchedulerFunctionKey:
+  SchedulerFunctionS3Key:
     Description: Key of Object within the S3 Bucket containing the Scheduler Lambda Function zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: Scheduler.zip
-    AllowedPattern: ^[-_.a-zA-Z0-9]*\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  SchedulerFunctionObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the Scheduler Lambda Function zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
+    AllowedPattern: ^Scheduler(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be Scheduler.zip, or Scheduler/<md5_hash>.zip.
   SchedulerLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the Scheduler Lambda Function
     Type: Number
@@ -178,8 +169,6 @@ Mappings:
       Name: SaoPaulo
       Code: se1
       TimeZone: America/Sao_Paulo
-Conditions:
-  ConfigureSchedulerFunctionObjectVersion: !Not [ !Equals [ !Ref SchedulerFunctionObjectVersion, '' ]]
 Resources:
   SchedulerRole:
     Type: AWS::IAM::Role
@@ -220,14 +209,13 @@ Resources:
       FunctionName: Scheduler
       Description: A Lambda function which starts, stops and/or terminates Instances based on a Schedule Tag.
       Role: !GetAtt SchedulerRole.Arn
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: 30
       Handler: Scheduler.handler
       Code:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref SchedulerFunctionKey
-        S3ObjectVersion: !If [ ConfigureSchedulerFunctionObjectVersion, !Ref SchedulerFunctionObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref SchedulerFunctionS3Key
       Environment:
         Variables:
           TAG: !Ref SchedulerTag

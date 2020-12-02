@@ -11,15 +11,12 @@ Metadata:
       - Label:
           default: Layer Configuration
         Parameters:
-          - AsyncCustomResourceLayerKey
-          - AsyncCustomResourceLayerObjectVersion
+          - AsyncCustomResourceLayeS3Key
     ParameterLabels:
       BucketsStackName:
         default: Buckets Stack Name
-      AsyncCustomResourceLayerKey:
+      AsyncCustomResourceLayerS3Key:
         default: AsyncCustomResource Layer S3 Key
-      AsyncCustomResourceLayerObjectVersion:
-        default: AsyncCustomResource Layer S3 Object Version
 Parameters:
   BucketsStackName:
     Description: Name of the CloudFormation Stack containing Buckets
@@ -29,22 +26,14 @@ Parameters:
     Default: Buckets
     AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
     ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
-  AsyncCustomResourceLayerKey:
+  AsyncCustomResourceLayerS3Key:
     Description: Key of Object within the S3 Bucket containing the AsyncCustomResource Lambda Layer zipfile
     Type: String
     MinLength: 2
     MaxLength: 64
     Default: AsyncCustomResourceLayer.zip
-    AllowedPattern: ^[A-Za-z][-_a-zA-Z0-9]*Layer\.zip$
-    ConstraintDescription: must be a valid zipfilename, not containing slashes.
-  AsyncCustomResourceLayerObjectVersion:
-    Description: Version of Object within the S3 Bucket containing the AsyncCustomResource Lambda Layer zipfile
-    Type: String
-    MaxLength: 32
-    Default: ''
-    ConstraintDescription: must be a valid S3 Object Version.
-Conditions:
-  ConfigureAsyncCustomResourceLayerObjectVersion: !Not [ !Equals [ !Ref AsyncCustomResourceLayerObjectVersion, '' ]]
+    AllowedPattern: ^AsyncCustomResourceLayer(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be AsyncCustomResourceLayer.zip, or AsyncCustomResourceLayer/<md5_hash>.zip.
 Resources:
   AsyncCustomResourceLayerVersion:
     Type: AWS::Lambda::LayerVersion
@@ -56,11 +45,11 @@ Resources:
       CompatibleRuntimes:
         - nodejs8.10
         - nodejs10.x
+        - nodejs12.x
       Content:
         S3Bucket: !ImportValue
           Fn::Sub: ${BucketsStackName}-FunctionsBucket
-        S3Key: !Ref AsyncCustomResourceLayerKey
-        S3ObjectVersion: !If [ ConfigureAsyncCustomResourceLayerObjectVersion, !Ref AsyncCustomResourceLayerObjectVersion, !Ref 'AWS::NoValue' ]
+        S3Key: !Ref AsyncCustomResourceLayerS3Key
 Outputs:
   AsyncCustomResourceLayerVersionArn:
     Description: The AsyncCustomResource Lambda LayerVersion ARN
