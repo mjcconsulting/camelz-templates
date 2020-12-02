@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-Topics Template.
+Description: Topics Template.
   This creates SNS Topics. These Topics are used for System Operation and should be in each Region used.
 Metadata:
   AWS::CloudFormation::Interface:

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Utility-DeepSecurity-Database Template.
+Description: DeepSecurity-Database Template.
   This template implements the Trend Micro DeepSecurity PostgreSQL RDS Database and related resources.
 Metadata:
   AWS::CloudFormation::Interface:

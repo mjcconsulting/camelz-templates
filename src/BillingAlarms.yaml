@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Billing-BillingAlarms Template.
+Description: BillingAlarms Template.
   This creates Billing CloudWatch Alarms, with Threshholds calculated based on Low, Normal and High limits.
 Metadata:
   AWS::CloudFormation::Interface:

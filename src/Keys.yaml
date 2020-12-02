@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-Keys Template.
+Description: Keys Template.
   This creates KMS Keys which should exist in every Region. These keys are used to encrypt various services.
 Metadata:
   AWS::CloudFormation::Interface:

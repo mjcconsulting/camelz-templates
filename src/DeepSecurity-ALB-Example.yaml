@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Utility-DeepSecurity-ALB-Example Template.
+Description: DeepSecurity-ALB-Example Template.
   This template is to work out details of an ALB
 Metadata:
   AWS::CloudFormation::Interface:

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Build-ImageBuilder-Components Template.
+Description: ImageBuilder-Components Template.
   WIP: This configures the ImageBuilder...
 Metadata:
   AWS::CloudFormation::Interface:

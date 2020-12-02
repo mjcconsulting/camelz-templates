@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-MarketplaceAMIFunctions Template.
+Description: MarketplaceAMIFunctions Template.
   This creates Lambda Functions related to Marketplace AMIs.
 Metadata:
   AWS::CloudFormation::Interface:

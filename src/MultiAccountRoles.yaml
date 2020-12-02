@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Identity-MultiAccountRoles Template.
+Description: MultiAccountRoles Template.
   This creates Multi-Account IAM Roles. These are not Application specific - Roles created here are for Multi-Account Access.
 Metadata:
   AWS::CloudFormation::Interface:

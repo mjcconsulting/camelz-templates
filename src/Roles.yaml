@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Identity-Roles Template.
+Description: Roles Template.
   This creates IAM Roles. These are not Application specific - Roles created here are for Federated Identity and Cross-Account Access. Roles should be kept in 1:1 sync with Groups, to insure IAM Users and Federated Users have the same permissions.
 Metadata:
   AWS::CloudFormation::Interface:

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Environment-NetworkAcls Template.
+Description: NetworkAcls Template.
   This adds NetworkAcls to an existing Environment VPC. This Template is optional, and can be added (or removed) at any time to apply an additional layer of network security. This initially simply replicates the Default NetworkAcl, so we have a Template from which we can iterate to tighten security.
 Metadata:
   AWS::CloudFormation::Interface:

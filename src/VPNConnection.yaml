@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-VPNConnection Template.
+Description: VPNConnection Template.
   This template adds a VPNConnection with an optional static route to an existing VPC and CustomerGateway.
 Metadata:
   AWS::CloudFormation::Interface:

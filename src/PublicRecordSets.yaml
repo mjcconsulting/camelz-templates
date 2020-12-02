@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-PublicRecordSets Template.
+Description: PublicRecordSets Template.
   This creates Manual Public RecordSets in a Public HostedZone.
 Metadata:
   AWS::CloudFormation::Interface:

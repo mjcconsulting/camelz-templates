@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Utility-ActiveDirectory Template.
+Description: ActiveDirectory Template.
   This creates 2 Active Directory Domain Controllers to a VPC. For adding members to the domain, ensure that they are
   launched into the ActiveDirectory-DomainMemberSecurityGroup created by this template.
 Metadata:

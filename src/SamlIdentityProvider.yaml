@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Identity-SamlIdentityProvider Template.
+Description: SamlIdentityProvider Template.
   This creates an IAM SAML Identity Provider.
 Metadata:
   AWS::CloudFormation::Interface:

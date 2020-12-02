@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-CloudWatchEventFunctions Template.
+Description: CloudWatchEventFunctions Template.
   This creates CloudWatch Event driven Lambda Functions.
   Initially, this contains only a function intended to dynamically created Private Route53 HostNames, based on Tags.
 Metadata:

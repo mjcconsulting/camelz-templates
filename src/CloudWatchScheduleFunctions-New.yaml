@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-CloudWatchScheduleFunctions Template.
+Description: CloudWatchScheduleFunctions Template.
   This creates CloudWatch Schedule driven Lambda Functions.
   Initially, this consists of a scheduler that can start and stop Instances based on a Schedule tag, and a
   CredentialsAuditor that will notify an SNS Topic when User Console Passwords or Access Keys near expiration limits,
@@ -119,7 +119,7 @@ Parameters:
       - 90
     ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
   SchedulerTag:
-    Description: Name of Tag associted with Instances containing Schedule information managed by this Function
+    Description: Name of Tag associated with Instances containing Schedule information managed by this Function
     Type: String
     Default: Schedule
     AllowedValues:

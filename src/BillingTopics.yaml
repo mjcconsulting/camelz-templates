@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Billing-BillingTopics Template.
+Description: BillingTopics Template.
   This creates Billing SNS Topics.
 Metadata:
   AWS::CloudFormation::Interface:

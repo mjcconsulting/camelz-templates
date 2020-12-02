@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Utility-OpenVPNAS Template.
+Description: OpenVPNAS Template.
   This adds OpenVPN Access Server Remote-User VPN capacity to a VPC. OpenVPN Access Server is the supported version of OpenVPN, available as a set of
   Marketplace AMIs. This Template allows section of the OpenVPN AccessServer 2 (free), 10, 25 or 50-user Marketplace AMIs. This template currently is not HA,
   due to limitations on what can be configured within the OpenVPNAS Marketplace AMI.

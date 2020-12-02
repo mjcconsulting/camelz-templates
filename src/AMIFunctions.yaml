@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-AMIFunctions Template.
+Description: AMIFunctions Template.
   This creates Lambda Functions related to Generic Base OS AMIs, usually published by Amazon.
 Metadata:
   AWS::CloudFormation::Interface:

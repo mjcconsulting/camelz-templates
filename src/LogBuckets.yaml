@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-LogBuckets Template.
+Description: LogBuckets Template.
   This creates Log (Audit) S3 Buckets.
 Metadata:
   AWS::CloudFormation::Interface:

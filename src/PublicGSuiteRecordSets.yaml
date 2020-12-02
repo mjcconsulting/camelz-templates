@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-PublicGSuiteRecordSets Template.
+Description: PublicGSuiteRecordSets Template.
   This creates Google G Suite Public RecordSets in a Public HostedZone. These follow a consistent pattern.
 Metadata:
   AWS::CloudFormation::Interface:

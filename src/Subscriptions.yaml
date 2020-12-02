@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-Subscriptions Template.
+Description: Subscriptions Template.
   This creates Subscriptions to SNS Topics.
 Metadata:
   AWS::CloudFormation::Interface:

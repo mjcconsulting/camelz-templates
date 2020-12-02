@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Baseline-Baseline Template.
+Description: Baseline Template.
   This creates Baseline Resources needed before Stacks can be created.
   Only the ZipFile method for Lambda Function Code is supported in this Template - this Stack will be created before
   any S3 Buckets exist. Also, this template contains a HACK to create the BaselineLayer directly from Encoded Content

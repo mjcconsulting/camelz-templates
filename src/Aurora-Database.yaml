@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Application-Aurora-Database Template.
+Description: Aurora-Database Template.
   This template implements an Aurora (MySQL) RDS Database and related resources.
 Metadata:
   AWS::CloudFormation::Interface:

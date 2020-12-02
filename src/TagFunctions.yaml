@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-TagFunctions Template.
+Description: TagFunctions Template.
   This creates Lambda Functions related to Tagging Resources.
 Metadata:
   AWS::CloudFormation::Interface:

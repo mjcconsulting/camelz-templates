@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Application-WebSphereMQ-Client Template. This template creates only the
+Description: WebSphereMQ-Client Template. This template creates only the
   WebSphereMQ-ClientSecurityGroup SecurityGroup, then integrates with an existing
   WebSphereMQ Application Stack running in another VPC.
 Metadata:

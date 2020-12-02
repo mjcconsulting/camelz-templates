@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-TransitGatewayAttachment Template.
+Description: TransitGatewayAttachment Template.
   This template creates a TransitGatewayAttachment.
 Metadata:
   AWS::CloudFormation::Interface:

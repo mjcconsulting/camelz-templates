@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-PublicHostedZone Template.
+Description: PublicHostedZone Template.
   This creates a Public HostedZone.
 Metadata:
   AWS::CloudFormation::Interface:

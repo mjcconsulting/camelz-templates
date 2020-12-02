@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Baseline-CloudCheckr Template.
+Description: CloudCheckr Template.
   This creates Baseline CloudCheckr Role needed by CloudCheckr.
 Metadata:
   AWS::CloudFormation::Interface:

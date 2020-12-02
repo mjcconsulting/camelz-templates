@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-KeyPairs Template.
+Description: KeyPairs Template.
   This imports EC2 KeyPairs. For each KeyPair, an rsa key must have been previously generated with the ssh-keygen command.
 Metadata:
   AWS::CloudFormation::Interface:

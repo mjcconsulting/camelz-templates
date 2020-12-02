@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Baseline-Codes Template.
+Description: Codes Template.
   This creates the Camelz Framework Codes Table, then loads it with code data.
 Metadata:
   AWS::CloudFormation::Interface:

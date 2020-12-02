@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-ReferenceFunctions Template.
+Description: ReferenceFunctions Template.
   This creates Lambda Functions which implement References to various types of Resources which may exist in different
   Regions and/or Accounts. There are two variants of this concept. The first does a cross-account lookup of a non-Shared
   Resource. The second works with Resource Access Manager to lookup a Resource shared with the current Account.

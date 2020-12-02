@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Identity-Users Template.
+Description: Users Template.
   This creates IAM Users. Only canonical users standard across all implementations of this framework should be created in this Template.
 Metadata:
   AWS::CloudFormation::Interface:

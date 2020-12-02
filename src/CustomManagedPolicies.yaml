@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Identity-CustomManagedPolicies Template.
+Description: CustomManagedPolicies Template.
   This creates Custom IAM ManagedPolicies.
 Rules:
   ValidateRegion:

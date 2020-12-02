@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Application-Aurora-Management Template.
+Description: Aurora-Management Template.
   This is an example of a Front-End Component, a Mangement Workstation for Aurora.
 Metadata:
   AWS::CloudFormation::Interface:

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Identity-CustomGroups Template.
+Description: CustomGroups Template.
   This creates Custom IAM Groups. Groups should be kept in 1:1 sync with Roles, to insure IAM Users and Federated Users have the same permissions.
 Metadata:
   AWS::CloudFormation::Interface:

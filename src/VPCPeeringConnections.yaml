@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Core-VPCPeeringConnections Template.
+Description: VPCPeeringConnections Template.
   This template creates all VPCPeeringConnections.
 Metadata:
   AWS::CloudFormation::Interface:

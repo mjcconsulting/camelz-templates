@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-BuildBuckets Template.
+Description: BuildBuckets Template.
   This creates Build S3 Buckets. These buckets hold artifacts created by Build Pipelines, for use by installation scripts when creating Instances.
 Metadata:
   AWS::CloudFormation::Interface:

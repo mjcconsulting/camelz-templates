@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-VPCPeeringConnection Template.
+Description: VPCPeeringConnection Template.
   This template creates a single VPCPeeringConnection.
 Metadata:
   AWS::CloudFormation::Interface:

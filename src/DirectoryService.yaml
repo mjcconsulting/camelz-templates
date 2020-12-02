@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Utility-DirectoryService Template.
+Description: DirectoryService Template.
   This creates a MicrosoftAD DirectoryService, and an associated Windows Instance for Directory Management.
 Metadata:
   AWS::CloudFormation::Interface:

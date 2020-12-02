@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-DomainFunctions Template.
+Description: DomainFunctions Template.
   This creates Lambda Functions related to Route53 Domains and HostedZones. There are direct Functions to make the
   changes within the same Account, and corresponding proxy Functions to make the changes in another Account.
 Metadata:

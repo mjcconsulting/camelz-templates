@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Identity-MultiAccountManagedPolicies Template.
+Description: MultiAccountManagedPolicies Template.
   This creates Multi-Account IAM ManagedPolicies, meant to be assumed by CustomResources running in another Account.
 Rules:
   ValidateRegion:

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Identity-CustomUsers Template.
+Description: CustomUsers Template.
   This creates Custom IAM Users. Any Users specific to an implementation of this Framework should go here, including all human Users.
 Metadata:
   AWS::CloudFormation::Interface:

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-PublicSESRecordSets Template.
+Description: PublicSESRecordSets Template.
   This creates Amazon SES Public RecordSets in a Public HostedZone.
 Metadata:
   AWS::CloudFormation::Interface:

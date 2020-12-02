@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-CustomerGateway Template.
+Description: CustomerGateway Template.
   This template creates a Customer Gateway.
 Metadata:
   AWS::CloudFormation::Interface:

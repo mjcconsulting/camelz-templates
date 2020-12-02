@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Utility-DeepSecurity Template.
+Description: DeepSecurity Template.
   This template implements the Trend Micro DeepSecurity Servers and Load Balancers.
 Metadata:
   AWS::CloudFormation::Interface:

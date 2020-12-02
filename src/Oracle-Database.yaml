@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Application-Oracle-Database Template.
+Description: Oracle-Database Template.
   This template implements an Oracle RDS Database and related resources.
 Metadata:
   AWS::CloudFormation::Interface:

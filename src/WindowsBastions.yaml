@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Utility-WindowsBastions Template.
+Description: WindowsBastions Template.
   This adds Windows Bastions to a VPC. These Bastions are wrapped in an AutoScalingGroup, so if they fail, they are re-created automatically. Optionally, static
   public and private IP addresses can be requested, and optionally registered in public and private DNS. Optionally, logs can be uploaded to CloudWatch Logs,
   with an Alarm to monitor invalid users.

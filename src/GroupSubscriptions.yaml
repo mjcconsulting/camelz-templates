@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-GroupSubscriptions Template.
+Description: GroupSubscriptions Template.
   This creates Standard Subscriptions to Group SNS Topics.
 Metadata:
   AWS::CloudFormation::Interface:

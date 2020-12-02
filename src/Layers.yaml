@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-Layers Template.
+Description: Layers Template.
   This creates Lambda Layers intended for use by Functions in multiple areas.
 Metadata:
   AWS::CloudFormation::Interface:

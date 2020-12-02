@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-CloudWatchScheduleFunctions Template.
+Description: CloudWatchScheduleFunctions Template.
   This creates CloudWatch Schedule driven Lambda Functions.
   Initially, this consists of a scheduler that can start and stop Instances based on a Schedule tag.
 Metadata:

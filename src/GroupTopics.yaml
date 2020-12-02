@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-GroupTopics Template.
+Description: GroupTopics Template.
   This creates Group SNS Topics.These Topics are used for Group Notifications, not directly related to System Operation.
 Metadata:
   AWS::CloudFormation::Interface:

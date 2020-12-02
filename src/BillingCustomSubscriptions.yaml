@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Billing-BillingCustomSubscriptions Template.
+Description: BillingCustomSubscriptions Template.
   This creates Custom Subscriptions to Billing SNS Topics.
 Metadata:
   AWS::CloudFormation::Interface:

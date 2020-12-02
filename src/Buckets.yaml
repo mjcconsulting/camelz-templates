@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-Buckets Template.
+Description: Buckets Template.
   This creates S3 Buckets which should exist in every Region. These buckets hold artifacts needed to build Stacks, which are not created as part of a Build Process.
 Metadata:
   AWS::CloudFormation::Interface:

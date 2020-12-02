@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Utility-Duo Template.
+Description: Duo Template.
   This template implements the Duo Single Sign-On Instances.
 Metadata:
   AWS::CloudFormation::Interface:

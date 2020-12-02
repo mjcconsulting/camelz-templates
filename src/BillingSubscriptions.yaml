@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Billing-BillingSubscriptions Template.
+Description: BillingSubscriptions Template.
   This creates Standard Subscriptions to Billing SNS Topics.
 Metadata:
   AWS::CloudFormation::Interface:

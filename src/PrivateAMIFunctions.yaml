@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Common-PrivateAMIFunctions Template.
+Description: PrivateAMIFunctions Template.
   This creates Lambda Functions related to Private AMIs. This is currently a placeholder for future Private AMI lookup functionality, which will not exist until we finish the Build VPC and Pipelines.
 Metadata:
   AWS::CloudFormation::Interface:
