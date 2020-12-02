@@ -1,0 +1,131 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SystemsManagerFunctions Template.
+  This creates Lambda Functions related to Systems Manager.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - LayersStackName
+          - BucketsStackName
+          - TopicsStackName
+      - Label:
+          default: Function Configuration
+        Parameters:
+          - DocumentFunctionS3Key
+          - DocumentLogRetention
+    ParameterLabels:
+      LayersStackName:
+        default: Layers Stack Name
+      BucketsStackName:
+        default: Buckets Stack Name
+      TopicsStackName:
+        default: Topics Stack Name
+      DocumentFunctionS3Key:
+        default: Document Function S3 Key
+      DocumentLogRetention:
+        default: Document Log Retention
+Parameters:
+  LayersStackName:
+    Description: Name of the CloudFormation Stack containing Layers
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: Layers
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  BucketsStackName:
+    Description: Name of the CloudFormation Stack containing Buckets
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: Buckets
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  TopicsStackName:
+    Description: Name of the CloudFormation Stack containing Topics
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: Topics
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
+  DocumentFunctionS3Key:
+    Description: Key of Object within the S3 Bucket containing the Document Lambda Function zipfile
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: Document.zip
+    AllowedPattern: ^Document(/[0-9a-f]{32})?\.zip$
+    ConstraintDescription: must be Document.zip, or Document/<md5_hash>.zip.
+  DocumentLogRetention:
+    Description: Number of days to retain CloudWatch Log Events for the Document Lambda Function
+    Type: Number
+    Default: 30
+    AllowedValues:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+    ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
+Resources:
+  DocumentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DocumentPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:ListDocuments
+                  - ssm:CreateDocument
+                  - ssm:UpdateDocument
+                  - ssm:DeleteDocument
+                Resource: '*'
+  DocumentLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/Document
+      RetentionInDays: !Ref DocumentLogRetention
+  DocumentFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: Document
+      Description: A Lambda function that creates a Systems Manager Document.
+      Role: !GetAtt DocumentRole.Arn
+      Runtime: nodejs12.x
+      Timeout: 30
+      Layers:
+        - !ImportValue
+            Fn::Sub: ${LayersStackName}-AsyncCustomResourceLayerVersionArn
+      Handler: Document.handler
+      Code:
+        S3Bucket: !ImportValue
+          Fn::Sub: ${BucketsStackName}-FunctionsBucket
+        S3Key: !Ref DocumentFunctionS3Key
+    DependsOn: DocumentLogGroup
+Outputs:
+  DocumentFunctionArn:
+    Description: The Document Lambda Function ARN
+    Value: !GetAtt DocumentFunction.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-DocumentFunctionArn

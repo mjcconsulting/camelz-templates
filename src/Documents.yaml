@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Documents Template.
+  This creates Systems Manager Documents. These Documents are used for System Operation and should be in each Region used.
+Resources:
+  ChangeAdministratorPasswordDocument:
+    Type: AWS::SSM::Document
+    Properties:
+      Name: Camelz-ChangeAdministratorPassword
+      DocumentType: Command
+      Content:
+        schemaVersion: '2.2'
+        description: Change Administrator Password.
+        parameters:
+          administratorPasswordParameter:
+            type: String
+            description: '(Optional) Administrator Password Parameter (If blank, password must be explicitly specified).'
+            default: 'Production-Administrator-Password'
+          administratorPassword:
+            type: String
+            description: '(Optional) Administrator Password (If specified, use this explicit Password value).'
+            default: ''
+        mainSteps:
+        - action: aws:runPowerShellScript
+          name: runPowerShellScript
+          precondition:
+            StringEquals: [ platformType, Windows ]
+          inputs:
+            runCommand:
+            - |
+              Try {
+                  If ( '{{administratorPassword}}' -ne '') {
+                      $Password = '{{administratorPassword}}'
+                      Write-Host "Set Administrator Password to '$Password'"
+                  } Else {
+                      $Parameter = '{{administratorPasswordParameter}}'
+                      $Password = (Get-SSMParameterValue -Name $Parameter -WithDecryption $True).Parameters.Value
+                      If ($Password -eq $Null) { Throw "'$Parameter' Parameter not found or contains no value" }
+                      Write-Host "Set Administrator Password to value of '$Parameter' Parameter"
+                  }
+                  $SecurePassword = ConvertTo-SecureString -String "$Password" -asPlainText -Force
+
+                  Set-LocalUser -Name Administrator -Password $SecurePassword
+                  Write-Host 'Successfully changed Administrator Password.'
+              } Catch {
+                  $Message = 'Exception on line {0}: {1}' -f $_.InvocationInfo.ScriptLineNumber, $_.Exception.Message
+                  Write-Error $Message
+                  Exit 1
+              }
+      Tags:
+        - Key: Name
+          Value: Camelz-ChangeAdministratorPassword
+  RenameComputerDocument:
+    Type: AWS::SSM::Document
+    Properties:
+      Name: Camelz-RenameComputer
+      DocumentType: Command
+      Content:
+        schemaVersion: '2.2'
+        description: Rename Computer.
+        parameters:
+          name:
+            type: String
+            description: '(Required) Computer Name.'
+            allowedPattern: '^[a-z]{3}[a-z1-9]{3}[abcdeijlmnopqrstux][a-z1-9]{3,5}[0-9]{2}[a-g]?$'
+        mainSteps:
+        - action: aws:runPowerShellScript
+          name: runPowerShellScript
+          precondition:
+            StringEquals: [ platformType, Windows ]
+          inputs:
+            runCommand:
+            - |
+              Try {
+                  $Name = '{{name}}'
+                  If ($Env:ComputerName –ne $Name) {
+                      Write-Host "Changing Computer Name to $Name"
+                      Rename-Computer -NewName $Name
+                      Write-Host 'Computer Name changed.'
+                      Exit 3010 # Tell Systems Manager to Restart
+                  }
+                  Else {
+                      Write-Host "Computer Name is $Name"
+                  }
+              } Catch {
+                  $Message = 'Exception on line {0}: {1}' -f $_.InvocationInfo.ScriptLineNumber, $_.Exception.Message
+                  Write-Error $Message
+                  Exit 1
+              }
+      Tags:
+        - Key: Name
+          Value: Camelz-RenameComputer
+Outputs:
+  ChangeAdministratorPasswordDocument:
+    Description: The ChangeAdministratorPassword Systems Manager Document
+    Value: !Ref ChangeAdministratorPasswordDocument
+    Export:
+      Name: !Sub ${AWS::StackName}-ChangeAdministratorPasswordDocument
+  RenameComputerDocument:
+    Description: The RenameComputer Systems Manager Document
+    Value: !Ref RenameComputerDocument
+    Export:
+      Name: !Sub ${AWS::StackName}-RenameComputerDocument
