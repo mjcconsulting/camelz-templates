@@ -1,0 +1,1060 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Bootstrap Template.
+  This Template creates Bootstrap Resources needed before Stacks can be created. These resources are
+  temporary, and will be deleted later in the build process once no longer needed. This template
+  contains a HACK to create a Bootstrap version of the AsyncCustomResource Layer directly from
+  Encoded Content as the normal Type only works with S3 Content, and with an empty Account, we will
+  not have even Bootstrap Buckets until after this Stack is up. This Layer provides the
+  cfn-response-promise Node.js module, which allows use of the async/await design pattern instead
+  of the older callback pattern, which we want to use consistently for all Lambda Functions. This
+  layer is only used by other Bootstrap Functions, and should be removed if CloudFormation adds this
+  missing module at some point.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Environment Configuration
+        Parameters:
+          - AccountAlias
+      - Label:
+          default: Layer Configuration
+        Parameters:
+          - BootstrapAsyncCustomResourceLayerEncodedContent
+      - Label:
+          default: Account Dependencies
+        Parameters:
+          - BootstrapAccountIds
+          - BootstrapAccountNames
+      - Label:
+          default: Bucket Configuration
+        Parameters:
+          - DeletionPolicy
+    ParameterLabels:
+      AccountAlias:
+        default: Account Alias
+      BootstrapAsyncCustomResourceLayerEncodedContent:
+        default: Bootstrap AsyncCustomResource Layer Encoded Content
+      BootstrapAccountIds:
+        default: Bootstrap Account IDs
+      BootstrapAccountNames:
+        default: Bootstrap Account Names
+      DeletionPolicy:
+        default: Deletion Policy
+Parameters:
+  AccountAlias:
+    Description: Unique Alias of the Account (if defined). If specified, the Alias instead of the AccountID is appended to bucket names to insure uniqueness.
+    Type: String
+    MaxLength: 32
+    Default: 'camelz'
+    AllowedPattern: (^$|^[a-z][-a-z0-9]*$)
+    ConstraintDescription: must begin with a lower case letter and contain lower case letters, numbers and dashes.
+  BootstrapAsyncCustomResourceLayerEncodedContent:
+    Description: Content of the BootstrapAsyncCustomResource Layer as a Base64-encoded string (Default is AsyncCustomResourceLayer.zip)
+    Type: String
+    Default: "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\
+      AFBLBQYAAAAABAAEAI0BAADUBAAAAAA="
+    ConstraintDescription: must be a Base64-encrypted string, containing the Layer archive content.
+  BootstrapAccountIds:
+    Description: AWS Account IDs of AWS Accounts which can access Bootstrap Bucket content
+    Type: String
+    Default: -,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+    AllowedPattern: ^((-|[0-9]{12}),){15}(-|[0-9]{12})$
+    ConstraintDescription: must be a comma-separated list of 16 values, each an AWS Account ID or '-'.
+  BootstrapAccountNames:
+    Description: Names of AWS Accounts which can access Bootstrap Bucket content
+    Type: String
+    Default: -,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+    AllowedPattern: ^((-|[-A-Za-z0-9]{1,64}),){15}(-|[-A-Za-z0-9]{1,64})$
+    ConstraintDescription: must be a comma-separated list of 16 values, each the Name on the AWS Account or '-'.
+  DeletionPolicy:
+    Description: Delete or Retain Bootstrap Buckets on Stack Deletion
+    Type: String
+    Default: Delete
+    AllowedValues:
+      - Delete
+      - Retain
+    ConstraintDescription: must be Delete or Retain.
+Rules:
+  ValidateRegion:
+    Assertions:
+      - Assert: !Equals [ !Ref 'AWS::Region', us-east-1 ]
+        AssertDescription: This Template can only be used in Region us-east-1.
+Conditions:
+  ConfigureGlobal: !Equals [ !Ref 'AWS::Region', us-east-1 ]
+  AppendAccountId: !Equals [ !Ref AccountAlias, '' ]
+  EmptyAndDeleteBuckets: !Equals [ !Ref DeletionPolicy, Delete ]
+  ConfigureBootstrapAccountId00: !Not [ !Equals [ !Select [  0, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId01: !Not [ !Equals [ !Select [  1, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId02: !Not [ !Equals [ !Select [  2, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId03: !Not [ !Equals [ !Select [  3, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId04: !Not [ !Equals [ !Select [  4, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId05: !Not [ !Equals [ !Select [  5, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId06: !Not [ !Equals [ !Select [  6, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId07: !Not [ !Equals [ !Select [  7, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId08: !Not [ !Equals [ !Select [  8, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId09: !Not [ !Equals [ !Select [  9, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId10: !Not [ !Equals [ !Select [ 10, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId11: !Not [ !Equals [ !Select [ 11, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId12: !Not [ !Equals [ !Select [ 12, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId13: !Not [ !Equals [ !Select [ 13, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId14: !Not [ !Equals [ !Select [ 14, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+  ConfigureBootstrapAccountId15: !Not [ !Equals [ !Select [ 15, !Split [ ',', !Ref BootstrapAccountIds ]], '-' ]]
+Resources:
+  BootstrapEncodedLayerVersionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ManageLambdaLayers
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: ListLayers
+                Effect: Allow
+                Action:
+                  - lambda:ListLayerVersions
+                Resource: '*'
+              - Sid: PublishLayers
+                Effect: Allow
+                Action:
+                  - lambda:PublishLayerVersion
+                Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:BootstrapAsyncCustomResource*
+              - Sid: ManageLayerVersions
+                Effect: Allow
+                Action:
+                  - lambda:GetLayerVersion
+                  - lambda:DeleteLayerVersion
+                Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:BootstrapAsyncCustomResource*:*
+  BootstrapEncodedLayerVersionFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: BootstrapEncodedLayerVersion
+      Description: A Lambda function which creates a Lambda LayerVersion from Base64-encoded Content.
+      Role: !GetAtt BootstrapEncodedLayerVersionRole.Arn
+      Runtime: nodejs12.x
+      Timeout: 30
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const response = require('./cfn-response');
+
+          const AWS = require('aws-sdk');
+          AWS.config.apiVersions = {
+            lambda: '2015-03-31'
+          };
+
+          const lambda = new AWS.Lambda();
+
+          exports.handler = (event, context) => {
+            console.info(`Request body:\n${JSON.stringify(event)}`);
+
+            const layerName = event.ResourceProperties.LayerName;
+            if (! layerName) {
+              const responseData = {Error: `Error: LayerName missing`};
+              console.error(responseData.Error);
+              response.send(event, context, response.FAILED, responseData);
+              return;
+            }
+            const content = event.ResourceProperties.Content.replace(/ /g, '');
+            if (! content && event.RequestType != 'Delete') {
+              const responseData = {Error: `Error: Content missing`};
+              console.error(responseData.Error);
+              response.send(event, context, response.FAILED, responseData);
+              return;
+            }
+
+            let params = {};
+            switch (event.RequestType) {
+              case 'Create':
+              case 'Update':
+                console.info(`Calling: PublishLayerVersion...`);
+                params = {
+                  LayerName: layerName,
+                  Content: {
+                    ZipFile: Buffer.from(content, 'base64')
+                  }
+                };
+                if (event.ResourceProperties.Description) params.Description = event.ResourceProperties.Description;
+                if (event.ResourceProperties.LicenseInfo) params.LicenseInfo = event.ResourceProperties.LicenseInfo;
+                if (event.ResourceProperties.CompatibleRuntimes) params.CompatibleRuntimes = event.ResourceProperties.CompatibleRuntimes;
+                lambda.publishLayerVersion(params, (err, data) => {
+                  if (err) {
+                    const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`};
+                    console.error(responseData.Error);
+                    response.send(event, context, response.FAILED, responseData);
+                  }
+                  else {
+                    const layerVersionArn = data.LayerVersionArn;
+                    const codeSha256 = data.Content.CodeSha256;
+                    const responseData = {CodeSha256: codeSha256};
+                    console.info(`LayerVersion: ${layerVersionArn} created, Code SHA-256: ${codeSha256}`);
+                    response.send(event, context, response.SUCCESS, responseData, layerVersionArn, false);
+                  }
+                });
+                break;
+
+              case 'Delete':
+                console.info(`Calling: ListLayerVersions...`);
+                  params = {
+                    LayerName: layerName
+                  };
+                  lambda.listLayerVersions(params, function(err, data) {
+                  if (err) {
+                    const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`};
+                    console.error(responseData.Error);
+                    response.send(event, context, response.FAILED, responseData);
+                  }
+                  else {
+                    const layerVersions = data.LayerVersions.map(lv => lv.Version);
+                    let deletePromises = [];
+                    for (const layerVersion of layerVersions) {
+                      params = {
+                        LayerName: layerName,
+                        VersionNumber: layerVersion
+                      };
+                      deletePromises.push(lambda.deleteLayerVersion(params).promise());
+                    }
+                    console.info(`Waiting for ${deletePromises.length} DeleteLayerVersion calls to finish...`);
+                    Promise.all(deletePromises).then(results => {
+                      console.info('LayerVersions deleted');
+                      response.send(event, context, response.SUCCESS);
+                    }).catch(err => {
+                      const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`};
+                      console.error(responseData.Error);
+                      response.send(event, context, response.FAILED, responseData);
+                    });
+                  }
+                });
+            }
+          };
+  BootstrapAsyncCustomResourceLayerVersion:
+    Type: Custom::BootstrapEncodedLayerVersion
+    Properties:
+      ServiceToken: !GetAtt BootstrapEncodedLayerVersionFunction.Arn
+      LayerName: BootstrapAsyncCustomResource
+      Description: A Lambda layer version which contains the cfn-response-promise module, needed to write Lambda Functions
+        which use the async/await coding style instead of callbacks.
+      LicenseInfo: MIT
+      CompatibleRuntimes:
+        - nodejs10.x
+        - nodejs12.x
+      Content: !Ref BootstrapAsyncCustomResourceLayerEncodedContent
+  BootstrapBucketManagerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ManageBootstrapBuckets
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource: !Sub
+                  - arn:aws:s3:::bootstrap-*-${Account}
+                  - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource: !Sub
+                  - arn:aws:s3:::bootstrap-*-${Account}/*
+                  - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
+  BootstrapBucketManagerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: BootstrapBucketManager
+      Description: A Lambda function that manages content in an S3 Bucket.
+      Role: !GetAtt BootstrapBucketManagerRole.Arn
+      Runtime: nodejs12.x
+      Timeout: 30
+      Layers:
+        - !Ref BootstrapAsyncCustomResourceLayerVersion
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const response = require('cfn-response-promise');
+
+          const AWS = require('aws-sdk');
+          AWS.config.apiVersions = {
+            s3: '2006-03-01'
+          };
+
+          const s3 = new AWS.S3();
+
+          const emptyBucket = async (bucketName) => {
+            const listParams = {
+              Bucket: bucketName
+            };
+            let listData = {};
+            do {
+              listData = await s3.listObjectVersions(listParams).promise();
+              //console.info(`- listObjectVersions Data:\n${JSON.stringify(listData, null, 2)}`);
+
+              if (listData.Versions.length > 0) {
+                const deleteParams = {
+                  Bucket: bucketName,
+                  Delete: {
+                    Objects: listData.Versions.map(v => ({Key: v.Key, VersionId: v.VersionId}))
+                  }
+                };
+                const deleting = deleteParams.Delete.Objects.length;
+                const deleteData = await s3.deleteObjects(deleteParams).promise();
+                const deleted = deleteData.Deleted.length;
+                if (deleting == deleted) {
+                  console.info(`- Deleted ${deleted} object versions`);
+                }
+                else {
+                  console.info(`- deleteObjects Data:\n${JSON.stringify(deleteData, null, 2)}`);
+                  throw new Error(`Could not delete ${deleting - deleted} object versions!`);
+                }
+              }
+
+              if (listData.DeleteMarkers.length > 0) {
+                const deleteParams = {
+                  Bucket: bucketName,
+                  Delete: {
+                    Objects: listData.DeleteMarkers.map(dm => ({Key: dm.Key, VersionId: dm.VersionId}))
+                  }
+                };
+                const deleting = deleteParams.Delete.Objects.length;
+                const deleteData = await s3.deleteObjects(deleteParams).promise();
+                const deleted = deleteData.Deleted.length;
+                if (deleting == deleted) {
+                  console.info(`- Deleted ${deleted} delete markers`);
+                }
+                else {
+                  console.info(`- deleteObjects Data:\n${JSON.stringify(deleteData, null, 2)}`);
+                  throw new Error(`Could not delete ${deleting - deleted} delete markers!`);
+                }
+              }
+
+              if (listData.IsTruncated) {
+                listParams.KeyMarker = listData.NextKeyMarker;
+                listParams.VersionIdMarker = listData.NextVersionIdMarker;
+              }
+            } while (listData.IsTruncated);
+
+            return;
+          };
+
+          const deleteBucket = async (bucketName) => {
+            const params = {
+              Bucket: bucketName
+            };
+            const data = await s3.deleteBucket(params).promise();
+            //console.info(`- deleteBucket Data:\n${JSON.stringify(data, null, 2)}`);
+
+            return;
+          };
+
+          exports.handler = async (event, context) => {
+            console.info(`Request body:\n${JSON.stringify(event)}`);
+
+            let bucketName;
+            let emptyAndDeleteBucket;
+
+            try {
+              bucketName = event.ResourceProperties.BucketName;
+              if (! bucketName) {
+                throw new Error(`BucketName missing: required Parameter`);
+              }
+
+              emptyAndDeleteBucket = /^(t(rue)?|y(es)?|1|on)$/i.test(event.ResourceProperties.EmptyAndDeleteBucket || 'True');
+            }
+            catch (err) {
+              const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`};
+              console.error(responseData.Error);
+              await response.send(event, context, response.FAILED, responseData);
+            }
+
+            console.info(`BucketName: ${bucketName}`);
+            console.info(`EmptyAndDeleteBucket: ${emptyAndDeleteBucket}`);
+
+            switch (event.RequestType) {
+              case 'Create':
+              case 'Update':
+                await response.send(event, context, response.SUCCESS, {}, bucketName + '-manager');
+                break;
+
+              case 'Delete':
+                try {
+                  if (emptyAndDeleteBucket) {
+                    console.info(`Calling: emptyBucket...`);
+                    await emptyBucket(bucketName);
+
+                    console.info(`Calling: deleteBucket...`);
+                    await deleteBucket(bucketName);
+                  }
+                  await response.send(event, context, response.SUCCESS);
+                }
+                catch (err) {
+                  const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`};
+                  console.error(responseData.Error);
+                  await response.send(event, context, response.FAILED, responseData);
+                }
+            }
+          };
+  BootstrapTemplatesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+        - bootstrap-templates-${Account}
+        - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: BootstrapTemplatesBucket
+    DeletionPolicy: Retain # We can't reference a Parameter here - Delete performed by BucketManager Function
+  BootstrapTemplatesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BootstrapTemplatesBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          #- Sid: AllowCloudFormationACLCheck
+          #  Effect: Allow
+          #  Principal:
+          #    Service: cloudformation.amazonaws.com
+          #  Action:
+          #    - s3:GetBucketAcl
+          #  Resource: !Sub arn:aws:s3:::${BootstrapTemplatesBucket}
+          #- Sid: AllowCloudFormationRead
+          #  Effect: Allow
+          #  Principal:
+          #    Service: cloudformation.amazonaws.com
+          #  Action:
+          #    - s3:GetObject
+          #  Resource: !Sub arn:aws:s3:::${BootstrapTemplatesBucket}/*
+          #- Sid: DenyUnEncryptedObjectUploads
+          #  Effect: Deny
+          #  Principal: '*'
+          #  Action:
+          #    - s3:PutObject
+          #  Resource:
+          #    - !Sub arn:aws:s3:::${BootstrapDocumentsBucket}/*
+          #  Condition:
+          #    StringNotEquals:
+          #      s3:x-amz-server-side-encryption:
+          #        - AES256
+          - Sid: AllowObjectMaintenanceByBootstrapAccounts
+            Effect: Allow
+            Principal:
+              AWS:
+                - !If
+                    - ConfigureBootstrapAccountId00
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 0, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId01
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 1, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId02
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 2, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId03
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 3, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId04
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 4, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId05
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 5, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId06
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 6, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId07
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 7, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId08
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 8, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId09
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 9, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId10
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 10, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId11
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 11, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId12
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 12, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId13
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 13, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId14
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 14, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId15
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 15, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+            Action:
+              - s3:*
+            Resource: !Sub arn:aws:s3:::${BootstrapTemplatesBucket}/*
+    DependsOn: BootstrapTemplatesBucket
+  BootstrapTemplatesBucketManager:
+    Type: Custom::BootstrapBucketManager
+    Properties:
+      ServiceToken: !GetAtt BootstrapBucketManagerFunction.Arn
+      BucketName: !Ref BootstrapTemplatesBucket
+      EmptyAndDeleteBucket: !If [ EmptyAndDeleteBuckets, True, 'AWS::NoValue' ]
+    DependsOn: BootstrapTemplatesBucket
+  BootstrapFunctionsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+        - bootstrap-functions-${Account}
+        - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: BootstrapFunctionsBucket
+    DeletionPolicy: Retain # We can't reference a Parameter here - Delete performed by BucketManager Function
+  BootstrapFunctionsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BootstrapFunctionsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowObjectMaintenanceByBootstrapAccounts
+            Effect: Allow
+            Principal:
+              AWS:
+                - !If
+                    - ConfigureBootstrapAccountId00
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 0, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId01
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 1, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId02
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 2, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId03
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 3, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId04
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 4, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId05
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 5, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId06
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 6, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId07
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 7, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId08
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 8, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId09
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 9, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId10
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 10, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId11
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 11, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId12
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 12, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId13
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 13, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId14
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 14, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId15
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 15, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+            Action:
+              - s3:*
+            Resource: !Sub arn:aws:s3:::${BootstrapFunctionsBucket}/*
+    DependsOn: BootstrapFunctionsBucket
+  BootstrapFunctionsBucketManager:
+    Type: Custom::BootstrapBucketManager
+    Properties:
+      ServiceToken: !GetAtt BootstrapBucketManagerFunction.Arn
+      BucketName: !Ref BootstrapFunctionsBucket
+      EmptyAndDeleteBucket: !If [ EmptyAndDeleteBuckets, True, 'AWS::NoValue' ]
+    DependsOn: BootstrapFunctionsBucket
+  BootstrapComponentsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+        - bootstrap-components-${Account}
+        - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: BootstrapComponentsBucket
+    DeletionPolicy: Retain # We can't reference a Parameter here - Delete performed by BucketManager Function
+  BootstrapComponentsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BootstrapComponentsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: DenyUnEncryptedObjectUploads
+            Effect: Deny
+            Principal: '*'
+            Action:
+              - s3:PutObject
+            Resource:
+              - !Sub arn:aws:s3:::${BootstrapComponentsBucket}/*
+            Condition:
+              StringNotEquals:
+                s3:x-amz-server-side-encryption:
+                  - AES256
+          - Sid: AllowObjectMaintenanceByBootstrapAccounts
+            Effect: Allow
+            Principal:
+              AWS:
+                - !If
+                    - ConfigureBootstrapAccountId00
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 0, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId01
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 1, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId02
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 2, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId03
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 3, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId04
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 4, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId05
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 5, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId06
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 6, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId07
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 7, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId08
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 8, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId09
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 9, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId10
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 10, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId11
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 11, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId12
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 12, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId13
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 13, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId14
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 14, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId15
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 15, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+            Action:
+              - s3:*
+            Resource: !Sub arn:aws:s3:::${BootstrapComponentsBucket}/*
+    DependsOn: BootstrapComponentsBucket
+  BootstrapComponentsBucketManager:
+    Type: Custom::BootstrapBucketManager
+    Properties:
+      ServiceToken: !GetAtt BootstrapBucketManagerFunction.Arn
+      BucketName: !Ref BootstrapComponentsBucket
+      EmptyAndDeleteBucket: !If [ EmptyAndDeleteBuckets, True, 'AWS::NoValue' ]
+    DependsOn: BootstrapComponentsBucket
+  BootstrapDocumentsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+        - bootstrap-documents-${Account}
+        - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: BootstrapDocumentsBucket
+    DeletionPolicy: Retain # We can't reference a Parameter here - Delete performed by BucketManager Function
+  BootstrapDocumentsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BootstrapDocumentsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: DenyUnEncryptedObjectUploads
+            Effect: Deny
+            Principal: '*'
+            Action:
+              - s3:PutObject
+            Resource:
+              - !Sub arn:aws:s3:::${BootstrapDocumentsBucket}/*
+            Condition:
+              StringNotEquals:
+                s3:x-amz-server-side-encryption:
+                  - AES256
+          - Sid: AllowObjectMaintenanceByBootstrapAccounts
+            Effect: Allow
+            Principal:
+              AWS:
+                - !If
+                    - ConfigureBootstrapAccountId00
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 0, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId01
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 1, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId02
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 2, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId03
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 3, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId04
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 4, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId05
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 5, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId06
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 6, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId07
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 7, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId08
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 8, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId09
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 9, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId10
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 10, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId11
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 11, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId12
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 12, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId13
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 13, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId14
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 14, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+                - !If
+                    - ConfigureBootstrapAccountId15
+                    - !Sub
+                        - arn:aws:iam::${AccountId}:root
+                        - AccountId: !Select [ 15, !Split [ ',', !Ref BootstrapAccountIds ]]
+                    - !Ref AWS::NoValue
+            Action:
+              - s3:*
+            Resource: !Sub arn:aws:s3:::${BootstrapDocumentsBucket}/*
+    DependsOn: BootstrapDocumentsBucket
+  BootstrapDocumentsBucketManager:
+    Type: Custom::BootstrapBucketManager
+    Properties:
+      ServiceToken: !GetAtt BootstrapBucketManagerFunction.Arn
+      BucketName: !Ref BootstrapDocumentsBucket
+      EmptyAndDeleteBucket: !If [ EmptyAndDeleteBuckets, True, 'AWS::NoValue' ]
+    DependsOn: BootstrapDocumentsBucket
+Outputs:
+  BootstrapTemplatesBucket:
+    Description: The BootstrapTemplates Bucket Name
+    Value: !Ref BootstrapTemplatesBucket
+  BootstrapFunctionsBucket:
+    Description: The BootstrapFunctions Bucket Name
+    Value: !Ref BootstrapFunctionsBucket
+  BootstrapComponentsBucket:
+    Description: The BootstrapComponents Bucket Name
+    Value: !Ref BootstrapComponentsBucket
+  BootstrapDocumentsBucket:
+    Description: The BootstrapDocuments Bucket Name
+    Value: !Ref BootstrapDocumentsBucket
