@@ -15,6 +15,7 @@ Metadata:
       - Label:
           default: Function Configuration
         Parameters:
+          - AMINameLogRetention
           - AliasNameLogRetention
           - LogGroupNameLogRetention
           - HostNameLogRetention
@@ -24,6 +25,8 @@ Metadata:
         default: Baseline Stack Name
       TableName:
         default: Table Name
+      AMINameLogRetention:
+        default: AMIName Log Retention
       AliasNameLogRetention:
         default: AliasName Log Retention
       LogGroupNameLogRetention:
@@ -49,6 +52,20 @@ Parameters:
     Default: Codes
     AllowedPattern: ^Codes$
     ConstraintDescription: must be Codes.
+  AMINameLogRetention:
+    Description: Number of days to retain CloudWatch Log Events for the AMIName Lambda Function
+    Type: Number
+    Default: 3
+    AllowedValues:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+    ConstraintDescription: must be 1, 3, 5, 7, 14, 30, 60 or 90.
   AliasNameLogRetention:
     Description: Number of days to retain CloudWatch Log Events for the AliasName Lambda Function
     Type: Number
@@ -431,14 +448,14 @@ Resources:
           Name: Prototype
           Code: proto
         - Type: System
-          Name: Analytics
-          Code: anal
-        - Type: System
-          Name: DAP
-          Code: dap
-        - Type: System
           Name: MJC
           Code: mjc
+        - Type: System
+          Name: POC
+          Code: poc
+        - Type: System
+          Name: GravitonPOC
+          Code: grpc
         - Type: Application
           Name: Acunetix
           Code: acu
@@ -448,9 +465,6 @@ Resources:
         - Type: Application
           Name: DirectoryService
           Code: adm
-        - Type: Application
-          Name: AutoSys
-          Code: as
         - Type: Application
           Name: Aurora
           Code: aur
@@ -482,14 +496,8 @@ Resources:
           Name: EMR
           Code: emr
         - Type: Application
-          Name: Engine
-          Code: eng
-        - Type: Application
           Name: ETL
           Code: etl
-        - Type: Application
-          Name: FederatedSecurity
-          Code: fs
         - Type: Application
           Name: SFTP
           Code: ftp
@@ -502,9 +510,6 @@ Resources:
         - Type: Application
           Name: Hadoop
           Code: had
-        - Type: Application
-          Name: LegalSolutionsSuite
-          Code: lss
         - Type: Application
           Name: LinuxWebServer
           Code: lws
@@ -527,20 +532,11 @@ Resources:
           Name: Nessus
           Code: nes
         - Type: Application
-          Name: Octopus
-          Code: oct
-        - Type: Application
           Name: Okta
           Code: okta
         - Type: Application
           Name: Oracle
           Code: ora
-        - Type: Application
-          Name: PAX
-          Code: pax
-        - Type: Application
-          Name: RiskMasterAccelerator
-          Code: rma
         - Type: Application
           Name: RabbitMQ
           Code: rmq
@@ -578,12 +574,6 @@ Resources:
           Name: UbuntuWebServerNested
           Code: uwsn
         - Type: Application
-          Name: Vertica
-          Code: v
-        - Type: Application
-          Name: Vormetric
-          Code: vor
-        - Type: Application
           Name: OpenVPN
           Code: vpn
         - Type: Application
@@ -614,17 +604,11 @@ Resources:
           Name: Agent
           Code: a
         - Type: Component
-          Name: Ambari
-          Code: a
-        - Type: Component
           Name: AccessGateway
           Code: ag
         - Type: Component
           Name: AccessServer
           Code: as
-        - Type: Component
-          Name: Calculation
-          Code: c
         - Type: Component
           Name: Cache
           Code: c
@@ -762,6 +746,90 @@ Resources:
                 Action:
                   - dynamodb:Get*
                 Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Codes
+  AMINameLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/AMIName
+      RetentionInDays: !Ref AMINameLogRetention
+  AMINameFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: AMIName
+      Description: A Lambda function which creates an AMIName that conforms to CaMeLz Framework Naming Conventions.
+      Role: !GetAtt IdentifierRole.Arn
+      Runtime: nodejs12.x
+      Timeout: 30
+      Layers:
+        - !ImportValue
+            Fn::Sub: ${BaselineStackName}-BaselineLayerVersionArn
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const response = require('cfn-response-promise');
+
+          const AWS = require('aws-sdk');
+          AWS.config.apiVersions = {
+            dynamodb: '2012-08-10'
+          };
+
+          const dynamodb = new AWS.DynamoDB();
+
+          const getCode = async (tableName, type, name) => {
+            console.info(`- Calling: GetItem for Type ${type}, Name ${name}...`);
+            const params = {
+              TableName: tableName,
+              Key: { Type: { S: type }, Name: { S: name }},
+              AttributesToGet: [ 'Code' ]
+            };
+            const data = await dynamodb.getItem(params).promise();
+            if (data.Item && data.Item.Code) {
+              return data.Item.Code.S;
+            }
+            else {
+              throw new Error(`Code for Name ${name} of Type ${type} not found`);
+            }
+          };
+
+          exports.handler = async (event, context) => {
+            console.info(`Request body:\n${JSON.stringify(event)}`);
+
+            const tableName = event.ResourceProperties.TableName || 'Codes';
+
+            switch (event.RequestType) {
+              case 'Create':
+              case 'Update':
+                try {
+                  const companyName = event.ResourceProperties.CompanyName;
+                  const companySegment = (companyName) ? `/${await getCode(tableName, 'Company', companyName)}` : '';
+
+                  const systemName = event.ResourceProperties.SystemName;
+                  const systemSegment = (systemName) ? `/${await getCode(tableName, 'System', systemName)}` : '';
+
+                  const serviceName = event.ResourceProperties.ServiceName;
+                  const serviceSegment = (serviceName) ? `/${serviceName}` : '';
+
+                  const applicationName = event.ResourceProperties.ApplicationName;
+                  const applicationSegment = (applicationName) ? `/${applicationName}` : '';
+
+                  const environmentName = event.ResourceProperties.EnvironmentName;
+                  const environmentSegment = (environmentName) ? `/${environmentName}` : '';
+
+                  const aliasname = `${companySegment}${systemSegment}${serviceSegment}${applicationSegment}${environmentSegment}`.substring(1);
+                  console.info('AliasName: ' + aliasname);
+                  await response.send(event, context, response.SUCCESS, null, aliasname);
+                }
+                catch (err) {
+                  const responseData = {Error: `${(err.code) ? err.code : 'Error'}: ${err.message}`};
+                  console.error(responseData.Error);
+                  await response.send(event, context, response.FAILED, responseData);
+                }
+                break;
+
+              case 'Delete':
+                await response.send(event, context, response.SUCCESS);
+                break;
+            }
+          };
   AliasNameLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -1130,6 +1198,11 @@ Outputs:
     Value: !GetAtt AliasNameFunction.Arn
     Export:
       Name: !Sub ${AWS::StackName}-AliasNameFunctionArn
+  AMINameFunctionArn:
+    Description: The AMIName Lambda Function ARN
+    Value: !GetAtt AMINameFunction.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-AMINameFunctionArn
   LogGroupNameFunctionArn:
     Description: The LogGroupName Lambda Function ARN
     Value: !GetAtt LogGroupNameFunction.Arn

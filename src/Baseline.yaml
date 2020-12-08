@@ -12,7 +12,6 @@ Metadata:
       - Label:
           default: Layer Configuration
         Parameters:
-          - BaselineLayerName
           - BaselineLayerEncodedContent
       - Label:
           default: Function Configuration
@@ -23,8 +22,6 @@ Metadata:
           - PrivateIpAddressLogRetention
           - KeyPairLogRetention
     ParameterLabels:
-      BaselineLayerName:
-        default: Baseline Layer Name
       BaselineLayerEncodedContent:
         default: Baseline Layer Encoded Content
       RandomPasswordLogRetention:
@@ -38,13 +35,6 @@ Metadata:
       KeyPairLogRetention:
         default: KeyPair Log Retention
 Parameters:
-  BaselineLayerName:
-    Description: Name of the Baseline Layer
-    Type: String
-    Default: Baseline
-    AllowedValues:
-      - Baseline
-    ConstraintDescription: must be Baseline.
   BaselineLayerEncodedContent:
     Description: Content of the Baseline Layer as a Base64-encoded string (Default is BaselineLayer.zip)
     Type: String
@@ -299,7 +289,7 @@ Resources:
     Type: Custom::EncodedLayerVersion
     Properties:
       ServiceToken: !GetAtt EncodedLayerVersionFunction.Arn
-      LayerName: !Ref BaselineLayerName
+      LayerName: Baseline
       Description: A Lambda layer version which contains the cfn-response-promise module, needed to write Lambda Functions
         which use the async/await coding style instead of callbacks.
       LicenseInfo: MIT
@@ -478,7 +468,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: SecureParameter
-      Description: A Lambda function that handles an SSM SecureString Parameter as a CustomResource, as this parameter Type is not currently supported.
+      Description: A Lambda function that handles an SSM SecureString Parameter as a CustomResource, as this parameter
+        Type is not currently supported.
       Role: !GetAtt SecureParameterRole.Arn
       Runtime: nodejs12.x
       Timeout: 30
@@ -692,7 +683,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: PrivateIpAddress
-      Description: A Lambda function which calculates a PrivateIpAddress as an Offset into a VPC Subnet, based on the Subnet CIDR obtained via a Subnet ID.
+      Description: A Lambda function which calculates a PrivateIpAddress as an Offset into a VPC Subnet, based on the
+        Subnet CIDR obtained via a Subnet ID.
       Role: !GetAtt PrivateIpAddressRole.Arn
       Runtime: nodejs12.x
       Timeout: 30
