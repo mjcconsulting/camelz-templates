@@ -11,7 +11,7 @@ Metadata:
       - Label:
           default: Layer Configuration
         Parameters:
-          - AsyncCustomResourceLayeS3Key
+          - AsyncCustomResourceLayerS3Key
     ParameterLabels:
       BucketsStackName:
         default: Buckets Stack Name
