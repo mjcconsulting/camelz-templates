@@ -1,9 +1,13 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: BuildBuckets Template.
-  This creates Build S3 Buckets. These buckets hold artifacts created by Build Pipelines, for use by installation scripts when creating Instances.
+  This creates Build S3 Buckets. These buckets hold artifacts used and/or created by Build Pipelines or the ImageBuilder.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
+      - Label:
+          default: Stack Dependencies
+        Parameters:
+          - FunctionsStackName
       - Label:
           default: Environment Configuration
         Parameters:
@@ -12,15 +16,28 @@ Metadata:
       - Label:
           default: Bucket Configuration
         Parameters:
-          - UseGlacier
+          - UseBucketManagers
+          - DeletionPolicy
     ParameterLabels:
+      FunctionsStackName:
+        default: Functions Stack Name
       AccountAlias:
         default: Account Alias
       EnvironmentName:
         default: Environment Name
-      UseGlacier:
-        default: Use Glacier
+      UseBucketManagers:
+        default: Use Bucket Managers
+      DeletionPolicy:
+        default: Deletion Policy
 Parameters:
+  FunctionsStackName:
+    Description: Name of the CloudFormation Stack containing Functions
+    Type: String
+    MinLength: 2
+    MaxLength: 64
+    Default: Functions
+    AllowedPattern: ^[A-Z][-a-zA-Z0-9]*$
+    ConstraintDescription: must begin with an upper case letter and contain alphanumeric characters and dashes.
   AccountAlias:
     Description: Unique Alias of the Account (if defined). If specified, the Alias instead of the AccountID is appended to bucket names to insure uniqueness.
     Type: String
@@ -48,140 +65,163 @@ Parameters:
       - Testing
       - Development
     ConstraintDescription: must be Organization, Jumpstart, Management, Core, Log, Build, Production, NonProduction, Recovery, Staging, UAT, QA, Testing or Development.
-  UseGlacier:
-    Description: Use Glacier for Archived Logs
+  UseBucketManagers:
+    Description: Use Bucket Managers (Allows Delete or Retain Buckets on Stack Deletion)
     Type: String
     Default: true
     AllowedValues:
       - true
       - false
     ConstraintDescription: must be either true or false.
+  DeletionPolicy:
+    Description: Delete or Retain Buckets on Stack Deletion
+    Type: String
+    Default: Delete
+    AllowedValues:
+      - Delete
+      - Retain
+    ConstraintDescription: must be Delete or Retain.
 Conditions:
   AppendAccountId: !Equals [ !Ref AccountAlias, '' ]
-  ConfigureGlacier: !Equals [ !Ref UseGlacier, true ]
+  ConfigureBucketManagers: !Equals [ !Ref UseBucketManagers, true ]
+  EmptyAndDeleteBuckets: !Equals [ !Ref DeletionPolicy, Delete ]
 Resources:
-  ApplicationsBucket:
+  ImageBuilderLogsBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub
-        - applications-${Account}-${AWS::Region}
+        - imagebuilder-logs-${Account}-${AWS::Region}
         - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
-      AccessControl: Private
-      VersioningConfiguration:
-        Status: Enabled
-      LifecycleConfiguration:
-        Rules:
-          - Id: ReduceStorageCostsThenDeletePriorVersions
-            Status: Enabled
-            Prefix: ''
-            Transitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 30
-            ExpirationInDays: 425
-            NoncurrentVersionTransitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 30
-            NoncurrentVersionExpirationInDays: 395
+      AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName}-ApplicationsBucket
+          Value: !Sub ${EnvironmentName}-ImageBuilderLogsBucket
     DeletionPolicy: Retain
-  ExamplesBucket:
+#  ImageBuilderLogsBucketPolicy:
+#    Type: AWS::S3::BucketPolicy
+#    Properties:
+#      Bucket: !Ref ImageBuilderLogsBucket
+#      PolicyDocument:
+#        Version: 2012-10-17
+#        Statement:
+#          - Sid: DenyUnEncryptedConnections
+#            Effect: Deny
+#            Principal:
+#              AWS: '*'
+#            Action: s3:*
+#            Resource: !Sub arn:aws:s3:::${ImageBuilderLogsBucket}/*
+#            Condition:
+#              Bool:
+#                aws:SecureTransport: false
+#          - Sid: DenyUnEncryptedObjectUploads
+#            Effect: Deny
+#            Principal:
+#              AWS: '*'
+#            Action: s3:PutObject
+#            Resource: !Sub arn:aws:s3:::${ImageBuilderLogsBucket}/*
+#            Condition:
+#              StringNotEquals:
+#                s3:x-amz-server-side-encryption: AES256
+#          - Sid: DenyDeletes
+#            Effect: Deny
+#            Principal:
+#              AWS: '*'
+#            Action: s3:Delete*
+#            Resource: !Sub arn:aws:s3:::${ImageBuilderLogsBucket}/*
+#          - Sid: DenyDeleteBucket
+#            Effect: Deny
+#            Principal:
+#              AWS: '*'
+#            Action: s3:DeleteBucket
+#            Resource: !Sub arn:aws:s3:::${ImageBuilderLogsBucket}
+#    DependsOn: ImageBuilderLogsBucket
+  ImageBuilderLogsBucketManager:
+    Type: Custom::BucketManager
+    Properties:
+      ServiceToken: !ImportValue
+        Fn::Sub: ${FunctionsStackName}-BucketManagerFunctionArn
+      BucketName: !Ref ImageBuilderLogsBucket
+      EmptyAndDeleteBucket: !If [ EmptyAndDeleteBuckets, True, 'AWS::NoValue' ]
+    DependsOn: ImageBuilderLogsBucket
+    Condition: ConfigureBucketManagers
+  ComponentsBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub
-        - examples-${Account}-${AWS::Region}
+        - components-${Account}-${AWS::Region}
         - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
-      AccessControl: Private
-      VersioningConfiguration:
-        Status: Enabled
-      LifecycleConfiguration:
-        Rules:
-          - Id: ReduceStorageCostsThenDeletePriorVersions
-            Status: Enabled
-            Prefix: ''
-            Transitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 30
-            ExpirationInDays: 425
-            NoncurrentVersionTransitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 30
-            NoncurrentVersionExpirationInDays: 395
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName}-ExamplesBucket
+          Value: !Sub ${EnvironmentName}-ComponentsBucket
     DeletionPolicy: Retain
-  DemosBucket:
+  ComponentsBucketManager:
+    Type: Custom::BucketManager
+    Properties:
+      ServiceToken: !ImportValue
+        Fn::Sub: ${FunctionsStackName}-BucketManagerFunctionArn
+      BucketName: !Ref ComponentsBucket
+      EmptyAndDeleteBucket: !If [ EmptyAndDeleteBuckets, True, 'AWS::NoValue' ]
+    DependsOn: ComponentsBucket
+    Condition: ConfigureBucketManagers
+  ArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub
-        - demos-${Account}-${AWS::Region}
+        - artifacts-${Account}-${AWS::Region}
         - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
-      AccessControl: Private
-      VersioningConfiguration:
-        Status: Enabled
-      LifecycleConfiguration:
-        Rules:
-          - Id: ReduceStorageCostsThenDeletePriorVersions
-            Status: Enabled
-            Prefix: ''
-            Transitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 30
-            ExpirationInDays: 425
-            NoncurrentVersionTransitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 30
-            NoncurrentVersionExpirationInDays: 395
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName}-DemosBucket
+          Value: !Sub ${EnvironmentName}-ArtifactsBucket
     DeletionPolicy: Retain
-  UsersBucket:
-    Type: AWS::S3::Bucket
+  ArtifactsBucketManager:
+    Type: Custom::BucketManager
     Properties:
-      BucketName: !Sub
-        - users-${Account}-${AWS::Region}
-        - Account: !If [ AppendAccountId, !Ref 'AWS::AccountId', !Ref AccountAlias ]
-      AccessControl: Private
-      VersioningConfiguration:
-        Status: Enabled
-      LifecycleConfiguration:
-        Rules:
-          - Id: ReduceStorageCostsThenDeletePriorVersions
-            Status: Enabled
-            Prefix: ''
-            Transitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 30
-            ExpirationInDays: 425
-            NoncurrentVersionTransitions:
-              - StorageClass: STANDARD_IA
-                TransitionInDays: 30
-            NoncurrentVersionExpirationInDays: 395
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-UsersBucket
-    DeletionPolicy: Retain
+      ServiceToken: !ImportValue
+        Fn::Sub: ${FunctionsStackName}-BucketManagerFunctionArn
+      BucketName: !Ref ArtifactsBucket
+      EmptyAndDeleteBucket: !If [ EmptyAndDeleteBuckets, True, 'AWS::NoValue' ]
+    DependsOn: ArtifactsBucket
+    Condition: ConfigureBucketManagers
 Outputs:
-  ApplicationsBucket:
-    Description: The Applications Bucket Name
-    Value: !Ref ApplicationsBucket
+  ImageBuilderLogsBucket:
+    Description: The ImageBuilder Logs Bucket Name
+    Value: !Ref ImageBuilderLogsBucket
     Export:
-      Name: !Sub ${AWS::StackName}-ApplicationsBucket
-  ExamplesBucket:
-    Description: The Examples Bucket Name
-    Value: !Ref ExamplesBucket
+      Name: !Sub ${AWS::StackName}-ImageBuilderLogsBucket
+  ComponentsBucket:
+    Description: The Components Bucket Name
+    Value: !Ref ComponentsBucket
     Export:
-      Name: !Sub ${AWS::StackName}-ExamplesBucket
-  DemosBucket:
-    Description: The Demos Bucket Name
-    Value: !Ref DemosBucket
+      Name: !Sub ${AWS::StackName}-ComponentsBucket
+  ArtifactsBucket:
+    Description: The Artifacts Bucket Name
+    Value: !Ref ArtifactsBucket
     Export:
-      Name: !Sub ${AWS::StackName}-DemosBucket
-  UsersBucket:
-    Description: The Users Bucket Name
-    Value: !Ref UsersBucket
-    Export:
-      Name: !Sub ${AWS::StackName}-UsersBucket
+      Name: !Sub ${AWS::StackName}-ArtifactsBucket

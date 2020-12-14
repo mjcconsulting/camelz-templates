@@ -18,9 +18,9 @@ for template in $(ls -1 *.{yaml,json} 2> /dev/null); do
   echo -n "- ${template%.*}... "
   mkdir -p $bucketdir/${template%.*}
   md5=$(md5 -q $srcdir/$template)
-  if [ ! -f $bucketdir/${template%.*}/$md5.${template#*.} ]; then
-    echo "Published ($md5.${template#*.})"
-    cp $srcdir/$template $bucketdir/${template%.*}/$md5.${template#*.}
+  if [ ! -f $bucketdir/${template%.*}/$md5.template ]; then
+    echo "Published ($md5.template)"
+    cp $srcdir/$template $bucketdir/${template%.*}/$md5.template
   else
     echo "Unchanged"
   fi

@@ -1,4 +1,4 @@
-# CAMELZ Templates
+# CaMeLz Templates
 Cross-Account Multi-Environment Landing Zones Framework CloudFormation Templates.
 
 These Templates are part of the CAMELZ Framework, meant to be created via the [CAMELZ CLI](https://github.com/mjcconsulting/camelz-cli) repo.
