@@ -234,7 +234,6 @@ Resources:
       FunctionName: BilingAlarmThresholdCalculator
       Description: A Lambda function which calculates Billing Alarm Thresholds for use in Billing Alarms.
         This calculates a set of Values which can be used to set Alarm Thresholds, based on Low, Normal and High Values.
-        This function intentionally does not use the async/await pattern, so it remains independent of Layers.
       Role: !GetAtt BillingAlarmThresholdCalculatorRole.Arn
       Runtime: nodejs12.x
       Timeout: 30
